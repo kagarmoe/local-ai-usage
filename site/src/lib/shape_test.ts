@@ -3,7 +3,7 @@ import { eventMarkers, heatmap, kpis, modelMix, parseWeeks, tokenRows, trendRows
 
 /** A complete tool week with 100 input tokens per day. */
 const tool = (o: Partial<ToolWeek> = {}): ToolWeek => ({
-  complete: true, tokens: { input: 0, cacheRead: 700, cacheWrite: 0, output: 10 }, perHour: [], context: { peak: 1000 }, models: {}, ...o,
+  complete: true, tokens: { input: 0, cacheRead: 700, cacheWrite: 0, output: 10 }, perHour: [], context: { peak: 1000 }, models: {}, subagentModels: {}, ...o,
 });
 const week = (w: string, start: string, o: Partial<Week> = {}): Week => ({ week: w, start, status: "complete", claudeCode: tool(), codex: null, ...o });
 const meta = (codex: Meta["baseline"]["codex"] = null): Meta => ({
@@ -29,6 +29,13 @@ Deno.test("model mix keeps the 7 models with the most input and groups the rest,
   const mix = modelMix([week("2026-W40", "2026-09-28", { claudeCode: tool({ models }) })], "claudeCode");
   assertEquals(mix.series.map((s) => s.label), ["a", "b", "c", "d", "e", "f", "g", "other"]);
   assertEquals(mix.rows[0].m7, 93 + 92 + 5);
+});
+
+Deno.test("model mix adds subagent input to the main-thread input per model", () => {
+  const stat = (input: number) => ({ calls: 1, input, output: 0, costUSD: null });
+  const mix = modelMix([week("2026-W40", "2026-09-28", { claudeCode: tool({ models: { a: stat(10) }, subagentModels: { a: stat(5), b: stat(7) } }) })], "claudeCode");
+  assertEquals(mix.series.map((s) => s.label), ["a", "b"]);
+  assertEquals([mix.rows[0].m0, mix.rows[0].m1], [15, 7]);
 });
 
 Deno.test("KPIs compare the latest complete week with the baseline", () => {

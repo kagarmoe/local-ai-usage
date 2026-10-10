@@ -8,6 +8,7 @@ export type ToolWeek = {
   perHour: { dow: number; hour: number; input: number }[];
   context: { peak: number };
   models: Record<string, ModelStat>;
+  subagentModels: Record<string, ModelStat>;
   rateLimits?: { fiveHourPeakPct: number | null; weeklyPeakPct: number | null };
 };
 export type Week = { week: string; start: string; status: string; claudeCode: ToolWeek | null; codex: ToolWeek | null };
@@ -74,10 +75,11 @@ export function tokenRows(weeks: Week[], tool: Tool): { series: Series; rows: Ro
   };
 }
 
-/** Input per plotted week by model: the tool's 7 models with the most input, the rest (and any raw "other") as "other". */
+/** Input per plotted week by model, main thread plus subagents: the tool's 7 models with the most input, the rest (and any raw "other") as "other". */
 export function modelMix(weeks: Week[], tool: Tool): { series: Series; rows: Row[] } {
   const rows = plotted(weeks, tool), totals: Record<string, number> = {};
-  for (const r of rows) for (const [m, s] of Object.entries(r.data?.models ?? {})) totals[m] = (totals[m] ?? 0) + s.input;
+  const stats = (t: ToolWeek | null) => [...Object.entries(t?.models ?? {}), ...Object.entries(t?.subagentModels ?? {})];
+  for (const r of rows) for (const [m, s] of stats(r.data)) totals[m] = (totals[m] ?? 0) + s.input;
   const top = Object.keys(totals).filter((m) => m !== "other").sort((a, b) => totals[b] - totals[a]).slice(0, 7);
   const labels = Object.keys(totals).length > top.length ? [...top, "other"] : top;
   // Model ids contain dots, which Recharts reads as paths: key the series m0…m7.
@@ -88,7 +90,7 @@ export function modelMix(weeks: Week[], tool: Tool): { series: Series; rows: Row
     rows: rows.map((r) => {
       const row: Row = { week: r.week };
       for (const s of series) row[s.key] = r.data ? 0 : null;
-      for (const [m, s] of Object.entries(r.data?.models ?? {})) row[keyOf(m)] = (row[keyOf(m)] as number) + s.input;
+      for (const [m, s] of stats(r.data)) row[keyOf(m)] = (row[keyOf(m)] as number) + s.input;
       return row;
     }),
   };
