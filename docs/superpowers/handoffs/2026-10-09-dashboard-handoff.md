@@ -41,7 +41,7 @@ Swamp notes: `~/obsidian/Resources/swamp/` (`swamp.md` index, `swamp-practice.md
    and the workflow steps, test-first with `deno task test`. The `blob-upload` task first checks
    that `vercel env pull` authenticates from env `VERCEL_TOKEN` (spec Status).
 2. When `site/` lands: set `dashboard-project` `rootDirectory: site` and
-   `commandForIgnoringBuildStep: git diff --quiet HEAD^ HEAD -- .`, then run
+   `commandForIgnoringBuildStep: [ -n "$VERCEL_GIT_PREVIOUS_SHA" ] && git diff --quiet "$VERCEL_GIT_PREVIOUS_SHA" HEAD -- .`, then run
    `swamp model method run dashboard-project update`.
 3. Domain: add a `dashboard-domain` (`@swamp/vercel/projects/domains`, project ID via CEL,
    `ai-usage.kimberlygarmoe.com`). This needs the user's OK. DNS is already on Vercel

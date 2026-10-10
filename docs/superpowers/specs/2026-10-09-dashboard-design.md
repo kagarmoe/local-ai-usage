@@ -149,8 +149,11 @@ one hour (`max-age=3600`), so the site may show data up to an hour old after an 
   - `rewrites`: `/data/:path*` →
     `https://rofnqrehqsduqz7m.public.blob.vercel-storage.com/data/:path*` (store
     `store_RoFNqrEhQsDUqZ7m`; confirmed by the spike).
-  - `ignoreCommand`: `git diff --quiet HEAD^ HEAD -- .`. Skips the build when `site/` did
-    not change, for example after the daily data commit.
+  - `ignoreCommand`: `[ -n "$VERCEL_GIT_PREVIOUS_SHA" ] && git diff --quiet "$VERCEL_GIT_PREVIOUS_SHA" HEAD -- .`. Skips the build when `site/` did
+    not change since the last successful deployment. With no previous deployment, or a SHA
+    missing from the shallow clone, it exits non-zero and Vercel builds. The earlier
+    `HEAD^ HEAD` form was replaced because it only sees the tip commit and misses site
+    commits under a later data commit (daily publish, rebase-merges) and the branch preview.
 - Local dev: the Vite dev server proxies `/data` to the same Blob host.
 - `src/lib/shape.ts`: pure functions with no imports. They turn weeks into chart rows.
   The React components only display rows.
@@ -268,7 +271,7 @@ spike steps from the main checkout for the same reason.
 `main` yet, so phase 1 leaves `rootDirectory` unset and ignores builds with
 `git diff --quiet HEAD^ HEAD -- site`; the daily data push is skipped. **When `site/` lands**,
 change the definition to `rootDirectory: site` and
-`commandForIgnoringBuildStep: git diff --quiet HEAD^ HEAD -- .`, then run
+`commandForIgnoringBuildStep: [ -n "$VERCEL_GIT_PREVIOUS_SHA" ] && git diff --quiet "$VERCEL_GIT_PREVIOUS_SHA" HEAD -- .`, then run
 `dashboard-project.update`. That replaces `site/vercel.json`'s `ignoreCommand`, which is then not
 needed. The `@swamp/vercel/projects` extension warns that `creator.via` is null and doesn't
 match its schema. This is harmless.

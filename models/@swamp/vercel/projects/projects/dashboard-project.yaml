@@ -14,6 +14,6 @@ globalArguments:
     type: github
     repo: kagarmoe/local-ai-usage
   rootDirectory: site
-  commandForIgnoringBuildStep: git diff --quiet HEAD^ HEAD -- .
+  commandForIgnoringBuildStep: '[ -n "$VERCEL_GIT_PREVIOUS_SHA" ] && git diff --quiet "$VERCEL_GIT_PREVIOUS_SHA" HEAD -- .'
   token: '${{ vault.get("secrets", "vercel-token") }}'
 methods: {}
