@@ -1,4 +1,4 @@
-# Handoff — local-ai-usage dashboard (sub-project 2), updated 2026-10-09 (post-build)
+# Handoff — local-ai-usage dashboard (sub-project 2), updated 2026-10-10 (full chart set built)
 
 Read first:
 - the spec, `docs/superpowers/specs/2026-10-09-dashboard-design.md`;
@@ -11,10 +11,26 @@ SDD ledger (git-ignored, keep it until merge): `.superpowers/sdd/2026-10-09-dash
 
 ## State
 
-- **Built:** all six plan tasks are built, reviewed per task, and have been through the opus
-  whole-branch review and its fix pass. Head **807bacc**, tree clean, **nothing pushed**.
-- **Checks passing in the worktree:**
-  - `PATH=$HOME/.swamp/deno:$PATH deno task test` → 44 passed.
+- **Full chart set built (bead `localai-mdf`, 2026-10-10).**
+  - Spec: `docs/superpowers/specs/2026-10-10-dashboard-full-design.md`.
+  - Plan: `docs/superpowers/plans/2026-10-10-dashboard-full.md`.
+  - Ledger: `.superpowers/sdd/2026-10-10-dashboard-full/progress.md`.
+  - Every deferred chart plus the Week and Day views is built. The work went through task reviews, the
+    opus whole-branch review (0 Critical, 2 Important, both fixed) and a fix pass.
+  - Commits: b916419, 6e136e5, 0c59593. Head is the handoff commit after them. **Nothing pushed.**
+  - Checks: `deno task test` → 56 passed; `npm run build` → OK.
+  - Headless Chromium on real data: overview, `?week=2026-W40` and a day view, light and dark, 0 console
+    errors. Bar clicks and week links open the clicked week or day.
+    Shots: `~/.claude/jobs/1c5e0728/tmp/shots/`.
+  - Deferred minors from the final review:
+    - The rate-limit title garbles when one window is null.
+    - An unpriced model drops from the cost mix without a note.
+    - `span` overstates sparse Codex coverage.
+    - `document.title` doesn't change per view.
+- **v1 (before the full chart set):** all six plan tasks are built, reviewed per task, and have been
+  through the opus whole-branch review and its fix pass (head was 807bacc).
+- **v1 checks passing in the worktree:**
+  - `PATH=$HOME/.swamp/deno:$PATH deno task test` → 44 passed (56 after the full chart set).
   - `cd site && npm run build` → OK (a 597 kB chunk warning).
   - `swamp model validate` passes for all four models.
   - `swamp workflow validate` passes for `local-ai-usage-weekly` (28) and `dashboard-setup` (13).
@@ -154,8 +170,8 @@ The same-run guard finding below is recorded in `~/obsidian/Resources/swamp/swam
   later; W36–W38 are gone. `stats-cache.json` (2026-06-08 – 07-16) leaves out cache reads, so it
   isn't comparable to the tracked data. History accumulates going forward in swamp data.
 - **Local preview done (2026-10-09).** Real `public/summary.json` was rendered by `render()` into a scratch
-  build and checked in headless Chrome at 1280px: 0 console errors. Minor: the Codex chart's "Baseline"
-  label overlaps the `2026-W40` tick. Use viewport screenshots; full-page shots catch Recharts
+  build and checked in headless Chrome at 1280px: 0 console errors. That run found the Codex chart's "Baseline"
+  label overlapping the `2026-W40` tick; fixed in 6e136e5. Use viewport screenshots; full-page shots catch Recharts
   mid-animation.
 
 ## Deferred minors
@@ -164,8 +180,7 @@ Full list in the ledger. Highlights:
 - **Upload and Blob:** upload `meta.json` last; a stale or cleared Blob goes undetected.
 - **Template leftovers:** `button.tsx` and its dependencies (`@base-ui/react`, `lucide-react`,
   `class-variance-authority`), `site/README.md`, `.oxlintrc.json`.
-- **Formatting:** `fmt(999_999)` shows "1000K".
-- **Page robustness:** no shape check on `meta.json`, no fetch abort, no empty-chart message.
+- **Page robustness:** no shape check on `meta.json`, no fetch abort. (The empty-chart message and `fmt(999_999)` were fixed in the full chart set.)
 - **Bundle size:** one 597 kB chunk.
 - **Workflow tags:** `dashboard-setup` has `tags: {}`.
 - **Missing test:** no test for temp-dir cleanup in `blob_upload`.
