@@ -256,6 +256,17 @@ committed on `dashboard`. The main checkout holds identical uncommitted copies; 
 `models/@swamp/vercel/blob-storage/`) right before merging. Run all later swamp setup and
 spike steps from the main checkout for the same reason.
 
+**Status 2026-10-09 (project):** the user approved it. `dashboard-project.create` made
+`prj_EgYL9x4XYklFy2fVnxD9jhQJmSDH` (`ai-usage`, Vite, Node 24.x), git-linked to
+`kagarmoe/local-ai-usage` with production branch `main`; no deployments yet. `site/` is not on
+`main` yet, so phase 1 leaves `rootDirectory` unset and ignores builds with
+`git diff --quiet HEAD^ HEAD -- site`; the daily data push is skipped. **When `site/` lands**,
+change the definition to `rootDirectory: site` and
+`commandForIgnoringBuildStep: git diff --quiet HEAD^ HEAD -- .`, then run
+`dashboard-project.update`. That replaces `site/vercel.json`'s `ignoreCommand`, which is then not
+needed. The `@swamp/vercel/projects` extension warns that `creator.via` is null and doesn't
+match its schema. This is harmless.
+
 ## Out of scope (bead `localai-mdf`)
 
 Cost charts, subagent model mix chart, context chart, Codex rate-limit chart, `?by=`

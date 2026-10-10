@@ -1,0 +1,20 @@
+type: '@swamp/vercel/projects/projects'
+typeVersion: 2026.10.08.1
+id: be74c093-915c-4804-96e2-d50b493d4cb3
+name: dashboard-project
+version: 1
+tags:
+  project: local-ai-usage
+  component: dashboard
+globalArguments:
+  teamId: team_SMACO8iOr6wPIGx5as56P468
+  name: ai-usage
+  framework: vite
+  gitRepository:
+    type: github
+    repo: kagarmoe/local-ai-usage
+  # Phase 1 (no site/ on main yet): skip every build that doesn't touch site/.
+  # When site/ lands: rootDirectory: site, and the ignore command becomes `-- .`.
+  commandForIgnoringBuildStep: git diff --quiet HEAD^ HEAD -- site
+  token: '${{ vault.get("secrets", "vercel-token") }}'
+methods: {}
