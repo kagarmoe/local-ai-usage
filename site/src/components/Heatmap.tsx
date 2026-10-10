@@ -29,7 +29,7 @@ export function Heatmap({ weeks }: { weeks: Week[] }) {
                   const pct = max ? Math.round((v / max) * 100) : 0;
                   return (
                     <td key={h} className="h-7 min-w-8 px-0.5 text-center"
-                      style={{ background: `color-mix(in oklch, var(--chart-1) ${pct}%, transparent)`, color: pct > 50 ? "white" : undefined }}>
+                      style={{ background: `color-mix(in oklch, var(--chart-1) ${Math.round(pct * 0.85)}%, transparent)` }}>
                       {v ? fmt(v) : ""}
                     </td>
                   );
