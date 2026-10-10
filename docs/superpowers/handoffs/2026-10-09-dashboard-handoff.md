@@ -24,8 +24,9 @@ Swamp notes: `~/obsidian/Resources/swamp/` (`swamp.md` index, `swamp-practice.md
 
 ## Blocked on the user
 
-1. **`blob-rw-token` holds the store ID, not the token.** The stored value is
-   `store_blBRxMbrxzEnI88l` (22 chars), and Vercel answers "Access denied". In Vercel, open
+1. **`blob-rw-token` holds the store ID, not the token.** The stored value is 22
+   characters, contains `blBRxMbrxzEnI88l`, and has no `vercel_blob_rw_` prefix, so it is almost
+   certainly the store ID. Vercel answers "Access denied". In Vercel, open
    Storage → `ai-usage` → `.env.local` tab → Show secret. Copy the value of
    `BLOB_READ_WRITE_TOKEN`, which starts with `vercel_blob_rw_` and is ~60 chars. Then run
    `cd ~/repos/local-ai-usage && swamp vault put secrets blob-rw-token -f`, which prompts for the
