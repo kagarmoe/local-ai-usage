@@ -61,15 +61,27 @@ Models communicate only through CEL data chaining (`data.latest(...)`).
 ### Model type `@kagarmoe/local-ai-usage/blob-upload` (new)
 
 - Global argument `token`: `z.string().meta({ sensitive: true })`. The definition sets
-  `${{ vault.get("secrets", "blob-rw-token") }}`. A literal value is rejected.
+  `${{ vault.get("secrets", "vercel-token") }}`. A literal value is rejected. There is no
+  Blob token in the vault: the store is connected to the `ai-usage` project, and the
+  method pulls the store's read-write token from the project on each run.
 - Method `put`. Arguments: `files` (`[{ pathname, content }]`) and `hash`.
-  1. Write each file to a temp directory.
-  2. For each file, run
-     `vercel blob put <file> --pathname <pathname> --access public --allow-overwrite true --add-random-suffix false --cache-control-max-age 3600 --content-type <type>`
-     with `Deno.Command`, and the token in env `BLOB_READ_WRITE_TOKEN`. The token never
-     goes in argv. A non-zero exit throws with the CLI's stderr.
-  3. Remove the temp directory (in `finally`).
-  4. Only after every upload succeeds, write resource `upload`:
+  1. Make a temp directory.
+  2. Run `vercel env pull <tmp>/.env.pulled --environment development --yes` with `cwd`
+     set to the repo root (linked to `ai-usage` by `vercel link`; `.vercel/` is
+     gitignored), and env `VERCEL_TOKEN` set from `token`. Read `BLOB_READ_WRITE_TOKEN` from the
+     pulled file.
+  3. Write each file to the temp directory. For each, run
+     `vercel blob put <file> --pathname <pathname> --access public --allow-overwrite --cache-control-max-age 3600 --content-type <type>`
+     with `Deno.Command`, `cwd` set to the temp directory, and the pulled token in env
+     `BLOB_READ_WRITE_TOKEN`. The token never goes in argv. A non-zero exit throws with
+     the CLI's stderr.
+     - `--allow-overwrite` and `--add-random-suffix` are on/off flags: a following
+       `true`/`false` is ignored, so `--add-random-suffix false` turns the suffix **on**.
+       Omit `--add-random-suffix` (the default is off). Verified by the spike.
+     - `cwd` must not be the repo root: a `.env.local` there holding `VERCEL_OIDC_TOKEN`
+       (written by `vercel link`) makes the CLI refuse to run without `BLOB_STORE_ID`.
+  4. Remove the temp directory, including the pulled file (in `finally`).
+  5. Only after every upload succeeds, write resource `upload`:
      `{ hash, pathnames, uploadedAt }`.
 - A failed run therefore records no new hash, and the next run retries.
 - Logic lives in `_lib/blob_upload.ts`, following the `_lib/publish.ts` pattern.
@@ -84,8 +96,8 @@ All definitions have tags `project: local-ai-usage` and `component: dashboard`. 
 | Definition | Type | Key arguments |
 |---|---|---|
 | `dashboard-data` | `@kagarmoe/local-ai-usage/dashboard-data` | `public` (CEL, above) |
-| `dashboard-upload` | `@kagarmoe/local-ai-usage/blob-upload` | `token` (vault, above) |
-| `dashboard-blob` | `@swamp/vercel/blob-storage/blob` | store name `ai-usage`, public access |
+| `dashboard-upload` | `@kagarmoe/local-ai-usage/blob-upload` | `token` (vault `vercel-token`, above) |
+| `dashboard-blob` | `@swamp/vercel/blob-storage/blob` | store name `ai-usage`, public access, `projectId: ${{ data.latest("dashboard-project", "ai-usage").attributes.id }}` (sent only by `create`; it connects the store to the project) |
 | `dashboard-project` | `@swamp/vercel/projects/projects` | `name: ai-usage`, `framework: vite`, `rootDirectory: site`, `gitRepository: kagarmoe/local-ai-usage` |
 | `dashboard-domain` | `@swamp/vercel/projects/domains` | `idOrName:` project ID (CEL), `name: ai-usage.kimberlygarmoe.com` |
 
@@ -95,10 +107,10 @@ implementation time.
 ### Workflows
 
 - `dashboard-setup` (new, run by hand, repeatable):
-  1. `dashboard-blob.create`, `dashboard-project.create`. Each has a guard that skips the
-     step when its data exists.
+  1. `dashboard-project.create`, then `dashboard-blob.create` (its `projectId` reads the
+     project's data). Each has a guard that skips the step when its data exists.
   2. `dashboard-domain.create`. It has a guard that skips the step when the domain data
-     exists. It depends on the project step with
+     exists. The blob and domain steps each depend on the project step with
      `{type: or, conditions: [{type: succeeded}, {type: skipped}]}`. A guarded skip
      otherwise cascades: a plain `succeeded` or `completed` dependent is skipped too.
 - `local-ai-usage-weekly` (changed):
@@ -112,8 +124,8 @@ implementation time.
     the first upload.
   - `publish` is unchanged and independent of `render` and `upload`.
 
-The `secrets` vault holds `vercel-token` and `blob-rw-token`. The user stores both with
-`swamp vault put secrets <key>`.
+The `secrets` vault holds `vercel-token`. The user stores it with
+`swamp vault put secrets vercel-token`.
 
 kimberlygarmoe.com uses Vercel nameservers, so the subdomain needs no DNS change outside
 Vercel.
@@ -134,8 +146,9 @@ one hour (`max-age=3600`), so the site may show data up to an hour old after an 
 - Build: `tsc -b && vite build`. A type error fails the Vercel build, and the live site
   stays on the last good deployment.
 - `site/vercel.json`:
-  - `rewrites`: `/data/:path*` → `https://<store-id>.public.blob.vercel-storage.com/data/:path*`.
-    The store host comes from `dashboard-blob` data after setup.
+  - `rewrites`: `/data/:path*` →
+    `https://rofnqrehqsduqz7m.public.blob.vercel-storage.com/data/:path*` (store
+    `store_RoFNqrEhQsDUqZ7m`; confirmed by the spike).
   - `ignoreCommand`: `git diff --quiet HEAD^ HEAD -- .`. Skips the build when `site/` did
     not change, for example after the daily data commit.
 - Local dev: the Vite dev server proxies `/data` to the same Blob host.
@@ -203,7 +216,7 @@ matches the day (ISO weekday, Monday = 1). Breadcrumb: All weeks › W41 › Wed
 | Failure | Result |
 |---|---|
 | Summary missing or wrong `schemaVersion` | `render` throws and writes nothing. `upload` does not run. The site keeps the last uploaded data. |
-| `blob-rw-token` missing, CLI error, or Blob down | `upload` throws and records no hash. The next run retries. `publish` is not affected. The failure shows in `swamp workflow history` and `~/Library/Logs/local-ai-usage.log`. |
+| `vercel-token` invalid, `vercel env pull` fails, CLI error, or Blob down | `upload` throws and records no hash. The next run retries. `publish` is not affected. The failure shows in `swamp workflow history` and `~/Library/Logs/local-ai-usage.log`. |
 | A run with no new usage (for example login, then 09:17) | The `upload` guard skips the step. |
 | Vercel build fails | Production stays on the last good deployment. |
 | Data files fail to load in the browser | The page shows "Could not load usage data" and no charts. |
@@ -219,7 +232,9 @@ matches the day (ISO weekday, Monday = 1). Breadcrumb: All weeks › W41 › Wed
   - A wrong `schemaVersion` throws.
 - `_lib/blob_upload.ts` (unit, a stub `vercel` script on `PATH` in a temp dir):
   - A non-zero exit throws.
-  - The token reaches the stub through env, not argv.
+  - The pulled token reaches the stub `blob put` through env, not argv, and the pulled
+    file is gone afterwards.
+  - The argv has no `--add-random-suffix` (regression for the spike finding).
 - `site/src/lib/shape.ts` (unit; the test task adds `site/src/lib/`):
   - Incomplete weeks are left out of trends.
   - The top-7 plus "other" grouping.
@@ -241,6 +256,7 @@ matches the day (ISO weekday, Monday = 1). Breadcrumb: All weeks › W41 › Wed
    - the public URL serves the file.
    If the CLI needs a login or a linked project, call the Blob API from `_lib/blob_upload.ts`
    instead. Interfaces stay the same.
+   **Done 2026-10-10** (see Status below): all three hold, with the flag fix above.
 2. Build `dashboard-data`, `blob-upload`, the site, and the workflow steps.
 3. Run `dashboard-setup` in full (project, domain), push the branch, check the views, and
    merge branch `dashboard` into `main`.
@@ -266,6 +282,23 @@ change the definition to `rootDirectory: site` and
 `dashboard-project.update`. That replaces `site/vercel.json`'s `ignoreCommand`, which is then not
 needed. The `@swamp/vercel/projects` extension warns that `creator.via` is null and doesn't
 match its schema. This is harmless.
+
+**Status 2026-10-10 (store recreated, spike done):** the first store (`store_blBRxMbrxzEnI88l`)
+was not connected to the project, and the extension sends `projectId` only in `create`, so with
+the user's approval it was deleted (empty) and recreated through swamp with `projectId` set.
+The new store is `store_RoFNqrEhQsDUqZ7m`, host `rofnqrehqsduqz7m.public.blob.vercel-storage.com`,
+connected to `ai-usage` in production, preview and development; Vercel added
+`BLOB_READ_WRITE_TOKEN` to the project. The main checkout is `vercel link`ed (`.vercel/` and
+`.env*` are ignored via `.git/info/exclude` there and via `.gitignore` on this branch). Spike
+results, via `vercel blob put` with the pulled token:
+- Without `--add-random-suffix`, puts land at the exact pathname; a second put overwrites.
+- A brand-new store's public host returned 404 for about two minutes, then served the file.
+- After an overwrite, the public URL served the new content within about 5 seconds
+  (`x-vercel-cache: HIT`, `cache-control: public, max-age=3600`).
+Not yet verified: that `vercel env pull` authenticates from env `VERCEL_TOKEN` (the spike used
+the CLI login). The `blob-upload` task checks this first, with an empty `--global-config`
+so the login can't mask it. If it fails, drop `VERCEL_TOKEN` and rely on the CLI login (the
+LaunchAgent runs as the user); never put the token in argv.
 
 ## Out of scope (bead `localai-mdf`)
 

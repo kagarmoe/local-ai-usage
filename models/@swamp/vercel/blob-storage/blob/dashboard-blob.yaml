@@ -10,5 +10,6 @@ globalArguments:
   teamId: team_SMACO8iOr6wPIGx5as56P468
   name: ai-usage
   access: public
+  projectId: '${{ data.latest("dashboard-project", "ai-usage").attributes.id }}'
   token: '${{ vault.get("secrets", "vercel-token") }}'
 methods: {}
