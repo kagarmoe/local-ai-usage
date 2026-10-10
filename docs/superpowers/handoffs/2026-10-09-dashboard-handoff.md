@@ -58,8 +58,8 @@ Ask about each step separately, one question at a time, and wait for an explicit
    - Rewrite this handoff.
 7. Then delete the SDD workspace and use `superpowers:finishing-a-development-branch`.
 
-Also offer, but don't do without an OK: record the guard finding below in
-`~/obsidian/Resources/swamp/swamp-currency.md`.
+The same-run guard finding below is recorded in `~/obsidian/Resources/swamp/swamp-currency.md`
+("Skill vs manual").
 
 ## Swamp: verified facts (don't relearn)
 
