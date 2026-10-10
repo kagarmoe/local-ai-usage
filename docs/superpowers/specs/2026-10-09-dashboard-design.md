@@ -154,19 +154,22 @@ one hour (`max-age=3600`), so the site may show data up to an hour old after an 
 - Local dev: the Vite dev server proxies `/data` to the same Blob host.
 - `src/lib/shape.ts`: pure functions with no imports. They turn weeks into chart rows.
   The React components only display rows.
-- Routing: `URLSearchParams`. Drill links are plain `<a href="?week=…&day=…">`, so Back
-  goes up one level and every view has a shareable URL. No router library.
+- One page, no routing. Week and Day drill-down views are deferred to bead `localai-mdf`.
 - Theme: shadcn default variables. `--chart-1` … `--chart-8` are set to Okabe-Ito.
   Dark mode follows `prefers-color-scheme`.
 
 ## Pages and charts (v1)
 
-### All weeks (`/`)
+v1 is a single overview page. The user chose this scope on 2026-10-10; the Week and Day
+views and the week list are deferred to bead `localai-mdf`.
 
-1. **KPI row**, one `Card` per metric. Each card shows the latest complete week, the
-   baseline, and the change in percent.
-   - Claude Code: input per day, peak context, subagent Opus share (by calls).
+### Overview (`/`)
+
+1. **KPI row**, one `Card` per metric (five cards). Each card shows the latest complete
+   week, the baseline, and the change in percent.
+   - Claude Code: input per day, peak context.
    - Codex: input per day, peak context, weekly rate-limit peak.
+   - Subagent Opus share is left out: the model-mix chart already shows it.
    - Input per day = (input + cacheRead + cacheWrite) / 7, the same formula as the
      baseline.
 2. **Trend**: input per day by week, one panel per tool. A dashed reference line shows
@@ -175,19 +178,7 @@ one hour (`max-age=3600`), so the site may show data up to an hour old after an 
    Codex also reasoning). One chart per tool.
 4. **Model mix**: input per week, stacked by model. One chart per tool.
 5. **Heatmap**: 7 × 24 table of input by weekday and hour, summed over all complete
-   weeks.
-6. **Week list**: every week with data, newest first, linked to its week view.
-   Incomplete weeks are marked "incomplete".
-
-### Week (`?week=2026-W41`)
-
-The KPI row for that week, tokens by type and model mix per day, the week's heatmap, and
-links to each day. A breadcrumb (All weeks › W41) links up.
-
-### Day (`?week=2026-W41&day=2026-10-07`)
-
-Hourly bars of input stacked by model, from the `perHour` rows of that week whose `dow`
-matches the day (ISO weekday, Monday = 1). Breadcrumb: All weeks › W41 › Wed 10-07.
+   weeks. It is public by the user's choice (it shows working hours).
 
 ### Chart rules
 
@@ -199,7 +190,6 @@ matches the day (ISO weekday, Monday = 1). Breadcrumb: All weeks › W41 › Wed
 - The heatmap uses one hue at increasing strength.
 - Units: "K tokens", "M tokens", "B tokens".
 - Incomplete weeks are not plotted. A `null` tool shows "no data", not zero.
-- An unknown `?week=` or `?day=` shows "No data for <value>" and a link to All weeks.
 
 ### Accessibility (WCAG 2.2 AA)
 
@@ -235,16 +225,16 @@ matches the day (ISO weekday, Monday = 1). Breadcrumb: All weeks › W41 › Wed
   - The pulled token reaches the stub `blob put` through env, not argv, and the pulled
     file is gone afterwards.
   - The argv has no `--add-random-suffix` (regression for the spike finding).
-- `site/src/lib/shape.ts` (unit; the test task adds `site/src/lib/`):
+- `site/src/lib/shape.ts` (unit; `deno task test` adds `site/src/lib/`, so CI's existing
+  `test.yml` runs these):
   - Incomplete weeks are left out of trends.
   - The top-7 plus "other" grouping.
-  - `dow` to date for a week.
   - KPI change against the baseline.
 - Swamp: `swamp workflow validate` for both workflows. Run the weekly workflow twice.
   Running AI sessions write to the scanned logs, so compare the two `dashboard-data`
   hashes: if they are equal, the second run must show `upload` skipped
   (`swamp workflow history get`). If they differ, it must upload.
-- No end-to-end test. After the first deploy, check the three views once with headless
+- No end-to-end test. After the first deploy, check the overview once with headless
   Playwright screenshots, light and dark. This is a one-time check, not a CI test.
 
 ## Rollout
@@ -303,5 +293,5 @@ LaunchAgent runs as the user); never put the token in argv.
 ## Out of scope (bead `localai-mdf`)
 
 Cost charts, subagent model mix chart, context chart, Codex rate-limit chart, `?by=`
-switch, combined Claude Code + Codex view, KPI sparklines, and the hour level of the
-drill-down.
+switch, combined Claude Code + Codex view, KPI sparklines, the week list, and the Week and
+Day drill-down views.
