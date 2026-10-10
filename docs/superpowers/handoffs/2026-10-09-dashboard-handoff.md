@@ -148,6 +148,16 @@ The same-run guard finding below is recorded in `~/obsidian/Resources/swamp/swam
   - `localai-jao`: swamp serve over Tailscale.
   - The beads↔GitHub sync offer is still pending.
 
+## Decisions
+
+- **No Claude Code backfill (user, 2026-10-09).** Transcripts on disk cover W35 (partial), W39 and
+  later; W36–W38 are gone. `stats-cache.json` (2026-06-08 – 07-16) leaves out cache reads, so it
+  isn't comparable to the tracked data. History accumulates going forward in swamp data.
+- **Local preview done (2026-10-09).** Real `public/summary.json` was rendered by `render()` into a scratch
+  build and checked in headless Chrome at 1280px: 0 console errors. Minor: the Codex chart's "Baseline"
+  label overlaps the `2026-W40` tick. Use viewport screenshots; full-page shots catch Recharts
+  mid-animation.
+
 ## Deferred minors
 
 Full list in the ledger. Highlights:
