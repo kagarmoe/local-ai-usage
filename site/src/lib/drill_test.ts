@@ -1,5 +1,5 @@
 import { assertEquals } from "jsr:@std/assert@1.0.19";
-import { dayMix, dayTokenRows, hourMix, hourTokenRows, href, parseView } from "./drill.ts";
+import { dayMix, dayTokenRows, drillWeeks, hourMix, hourTokenRows, href, parseView } from "./drill.ts";
 import { emptyText, type Day, type Hour, type ToolWeek, type Week } from "./shape.ts";
 
 const tool = (o: Partial<ToolWeek> = {}): ToolWeek => ({
@@ -7,16 +7,17 @@ const tool = (o: Partial<ToolWeek> = {}): ToolWeek => ({
   context: { avgLongSession: 0, p95: 0, peak: 0 }, models: {}, subagentModels: {}, ...o,
 });
 const week = (w: string, start: string, o: Partial<Week> = {}): Week => ({ week: w, start, status: "complete", claudeCode: tool(), codex: null, ...o });
-const weeks = [week("2026-W41", "2026-10-05", { status: "incomplete" }), week("2026-W40", "2026-09-28"), week("2026-W39", "2026-09-21")];
+// An incomplete week starts before the oldest log, so it is the oldest week.
+const weeks = [week("2026-W40", "2026-09-28"), week("2026-W39", "2026-09-21"), week("2026-W38", "2026-09-14", { status: "incomplete" })];
 
 Deno.test("parseView opens a valid week and day with its measure", () => {
-  assertEquals(parseView("?week=2026-W40&day=2026-09-29&by=cost", weeks), { view: { level: "day", week: weeks[1], day: "2026-09-29" }, by: "cost", notice: null });
+  assertEquals(parseView("?week=2026-W40&day=2026-09-29&by=cost", weeks), { view: { level: "day", week: weeks[0], day: "2026-09-29" }, by: "cost", notice: null });
 });
 
 Deno.test("parseView falls back with a notice for an unknown or incomplete week and an outside day, and ignores a bad measure", () => {
   assertEquals(parseView("?week=2026-W12", weeks), { view: { level: "overview" }, by: "input", notice: "No data for week 2026-W12." });
-  assertEquals(parseView("?week=2026-W41", weeks).notice, "2026-W41 is still in progress; its charts appear when it ends.");
-  assertEquals(parseView("?week=2026-W40&day=2026-10-05&by=nope", weeks), { view: { level: "week", week: weeks[1] }, by: "input", notice: "2026-10-05 is not in 2026-W40." });
+  assertEquals(parseView("?week=2026-W38", weeks).notice, "2026-W38 starts before the oldest log, so it is not plotted.");
+  assertEquals(parseView("?week=2026-W40&day=2026-10-05&by=nope", weeks), { view: { level: "week", week: weeks[0] }, by: "input", notice: "2026-10-05 is not in 2026-W40." });
 });
 
 Deno.test("href keeps week and day and leaves out the default measure", () => {
@@ -47,4 +48,10 @@ Deno.test("a tool without prices has no cost data, even in an idle hour", () => 
   // regression: Codex's idle hours made its cost-by-model chart say "none"
   const w = week("2026-W40", "2026-09-28", { codex: tool({ costUSD: null, models: { "gpt-5.5": { calls: 1, input: 5, output: 1, costUSD: null } } }) });
   assertEquals(emptyText(hourMix([w], w, "2026-09-29", "codex", "cost", "models").rows), "no data");
+});
+
+Deno.test("the week list leaves out weeks where neither tool has data", () => {
+  // regression: half the real week links opened pages that said only "no data"
+  const ws = [week("2026-W40", "2026-09-28"), week("2026-W39", "2026-09-21", { claudeCode: null }), week("2026-W38", "2026-09-14")];
+  assertEquals(drillWeeks(ws).map((w) => w.week), ["2026-W40", "2026-W38"]);
 });

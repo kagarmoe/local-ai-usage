@@ -39,7 +39,8 @@ function Stacked({ rows, series, x, unit, onSelect }: Data & { x: X; unit: Unit;
           <Bar
             key={s.key} dataKey={s.key} stackId="a" fill={`var(--color-${s.key})`}
             className={onSelect ? "cursor-pointer" : undefined}
-            onClick={onSelect ? (_, i) => onSelect(rows[i]) : undefined}
+            // Recharts skips empty bars when numbering them, so take the row from the bar, not the index.
+            onClick={onSelect ? (bar) => onSelect(bar.payload as Row) : undefined}
           />
         ))}
       </BarChart>

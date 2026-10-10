@@ -13,8 +13,8 @@ export const days = (w: Week) => DAYS.map((d, i) => {
   return { date, label: `${d} ${date.slice(5)}` };
 });
 
-/** Weeks you can open, newest first: every week either tool plots. */
-export const drillWeeks = (weeks: Week[]) => anyPlotted(weeks).reverse();
+/** Weeks in the week list, newest first: plotted weeks where either tool has data. Other plotted weeks still open from a URL. */
+export const drillWeeks = (weeks: Week[]) => anyPlotted(weeks).filter((w) => w.claudeCode || w.codex).reverse();
 
 /** The view a query string asks for. An unknown or incomplete week falls back to the overview, a day outside the week to the week, each with a notice; a bad measure falls back to input. */
 export function parseView(search: string, weeks: Week[]): Nav {
@@ -24,8 +24,8 @@ export function parseView(search: string, weeks: Week[]): Nav {
   if (!wk) return nav({ level: "overview" });
   const w = anyPlotted(weeks).find((w) => w.week === wk);
   if (!w) {
-    const busy = weeks.some((x) => x.week === wk && x.status === "incomplete");
-    return nav({ level: "overview" }, busy ? `${wk} is still in progress; its charts appear when it ends.` : `No data for week ${wk}.`);
+    const early = weeks.some((x) => x.week === wk && x.status === "incomplete");
+    return nav({ level: "overview" }, early ? `${wk} starts before the oldest log, so it is not plotted.` : `No data for week ${wk}.`);
   }
   if (!day) return nav({ level: "week", week: w });
   return days(w).some((d) => d.date === day) ? nav({ level: "day", week: w, day }) : nav({ level: "week", week: w }, `${day} is not in ${wk}.`);
