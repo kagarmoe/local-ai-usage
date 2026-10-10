@@ -22,3 +22,6 @@
 # END swamp managed section
 .vercel
 .env*
+
+# The user's global python ignore lists /site (mkdocs output); ours is the dashboard source.
+!/site
