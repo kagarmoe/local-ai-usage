@@ -1,0 +1,8 @@
+type: '@kagarmoe/local-ai-usage/codex'
+typeVersion: 2026.10.09.1
+id: 0cb5c93a-c295-4270-bfb8-fb488c4f9534
+name: codex
+version: 1
+tags: {}
+globalArguments: {}
+methods: {}

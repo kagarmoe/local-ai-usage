@@ -1,0 +1,43 @@
+# USD per million tokens. claude: scans add missing models from cost-state records. codex: enter by hand.
+claude:
+  claude-fable-5:
+    cacheRead: 1.1121
+    cacheWrite: 13.9018
+    input: 11.1214
+    output: 55.607
+  claude-fable-5-1:
+    cacheRead: 0.5396
+    cacheWrite: 6.7451
+    input: 5.3961
+    output: 26.9805
+  claude-haiku-4-5-20251001:
+    cacheRead: 0.1
+    cacheWrite: 1.25
+    input: 1
+    output: 5
+  claude-haiku-5-5:
+    cacheRead: 0.0104
+    cacheWrite: 0.1294
+    input: 0.1035
+    output: 0.5175
+  claude-opus-4-7:
+    cacheRead: 0.5
+    cacheWrite: 6.25
+    input: 5
+    output: 25
+  claude-opus-5-5:
+    cacheRead: 0.2749
+    cacheWrite: 3.4363
+    input: 2.749
+    output: 13.745
+  'claude-opus-5[1m]':
+    cacheRead: 0.5
+    cacheWrite: 6.25
+    input: 5
+    output: 25
+  claude-sonnet-5-5:
+    cacheRead: 0.1985
+    cacheWrite: 2.4806
+    input: 1.9845
+    output: 9.9225
+codex: {}

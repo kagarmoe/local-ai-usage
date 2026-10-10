@@ -1,0 +1,8 @@
+type: command/shell
+typeVersion: 2026.02.09.1
+id: 2db3c015-bb20-4b1f-ba4d-0dbc656d6969
+name: publish
+version: 1
+tags: {}
+globalArguments: {}
+methods: {}

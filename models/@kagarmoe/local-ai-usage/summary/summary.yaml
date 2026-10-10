@@ -1,0 +1,8 @@
+type: '@kagarmoe/local-ai-usage/summary'
+typeVersion: 2026.10.09.1
+id: db4e052a-9b7a-42f0-9898-64e3d9e002a1
+name: summary
+version: 1
+tags: {}
+globalArguments: {}
+methods: {}

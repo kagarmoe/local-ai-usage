@@ -1,0 +1,49 @@
+id: 422542ed-35bf-48c3-9612-9c4d8bc634d9
+name: local-ai-usage-weekly
+tags: {}
+reports:
+  require: ["@kagarmoe/local-ai-usage-report"]
+jobs:
+  - name: scan
+    steps:
+      - name: scan-claude-code
+        task:
+          type: model_method
+          modelIdOrName: claude-code
+          methodName: scanMissing
+          inputs: {}
+        allowFailure: true
+      - name: scan-codex
+        task:
+          type: model_method
+          modelIdOrName: codex
+          methodName: scanMissing
+          inputs: {}
+        allowFailure: true
+  - name: build
+    dependsOn:
+      - job: scan
+        condition:
+          type: completed
+    steps:
+      - name: build-summary
+        task:
+          type: model_method
+          modelIdOrName: summary
+          methodName: build
+          inputs: {}
+  - name: publish
+    dependsOn:
+      - job: build
+        condition:
+          type: succeeded
+    steps:
+      - name: publish
+        task:
+          type: model_method
+          modelIdOrName: publish
+          methodName: execute
+          inputs:
+            run: sh scripts/publish.sh
+            workingDir: /Users/kimberlygarmoe/repos/local-ai-usage
+version: 1
