@@ -42,7 +42,19 @@ SDD ledger (git-ignored, keep it until merge): `.superpowers/sdd/2026-10-09-dash
 
 Ask about each step separately, one question at a time, and wait for an explicit OK on each.
 
-1. **Copy, then run the weekly workflow.**
+1. **Done, except the second-run check.** The LaunchAgent run at 2026-10-10 09:17 PDT made the
+   first upload. Every step succeeded.
+   - The render hash and the put hash are the same (`02f34cfb…`).
+   - The public Blob `data/weeks.jsonl` (40 lines) and `data/meta.json` are byte-identical to
+     `render`'s content.
+   - `render` used summary v6, built earlier in the same run.
+   - No BigInt or CEL error.
+   - `meta.json` `generatedAt` is the latest *scan* time (`_lib/summary.ts:60`), so it stays put on
+     runs that find no new logs.
+   - **Still to check:** the next run (login or 09:17) should log `upload: skipped`.
+   - The main-checkout copies are what the LaunchAgent runs. Keep them until merge prep.
+
+   The original step, kept for the record: **copy, then run the weekly workflow.**
    - Copy the branch into the main checkout:
      `git -C ~/repos/local-ai-usage restore --source=dashboard --worktree -- <paths>`.
      The paths are the extension models (`dashboard_data`, `blob_upload`), their definitions, the
