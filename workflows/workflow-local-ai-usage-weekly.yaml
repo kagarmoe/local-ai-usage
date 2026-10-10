@@ -44,4 +44,30 @@ jobs:
           modelIdOrName: publish
           methodName: publish
           inputs: {}
+  - name: dashboard
+    dependsOn:
+      - job: build
+        condition:
+          type: succeeded
+    steps:
+      - name: render
+        task:
+          type: model_method
+          modelIdOrName: dashboard-data
+          methodName: render
+          inputs: {}
+      - name: upload
+        dependsOn:
+          - step: render
+            condition:
+              type: succeeded
+        # Skips unchanged data (the workflow runs at login and at 09:17); works before the first upload.
+        guard: '${{ data.latest("dashboard-upload", "upload").?attributes.?hash.orValue("") == data.latest("dashboard-data", "data").attributes.hash }}'
+        task:
+          type: model_method
+          modelIdOrName: dashboard-upload
+          methodName: put
+          inputs:
+            files: '${{ data.latest("dashboard-data", "data").attributes.files }}'
+            hash: '${{ data.latest("dashboard-data", "data").attributes.hash }}'
 version: 1

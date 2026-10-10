@@ -20,3 +20,9 @@
 .claude/scheduled_tasks.lock
 .claude/scheduled_tasks.json
 # END swamp managed section
+.vercel
+.env*
+
+# The user's global python ignore lists /site (mkdocs output); ours is the dashboard source.
+!/site
+!site/src/lib/

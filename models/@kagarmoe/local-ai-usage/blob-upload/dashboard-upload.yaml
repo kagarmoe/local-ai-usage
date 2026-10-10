@@ -1,0 +1,11 @@
+type: '@kagarmoe/local-ai-usage/blob-upload'
+typeVersion: 2026.10.09.1
+id: b2f020cc-3eb2-46b2-8e75-ef33deb6f080
+name: dashboard-upload
+version: 1
+tags:
+  project: local-ai-usage
+  component: dashboard
+globalArguments:
+  token: '${{ vault.get("secrets", "vercel-token") }}'
+methods: {}

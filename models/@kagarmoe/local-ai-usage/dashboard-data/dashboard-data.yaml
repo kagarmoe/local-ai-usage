@@ -1,0 +1,11 @@
+type: '@kagarmoe/local-ai-usage/dashboard-data'
+typeVersion: 2026.10.09.1
+id: 8b5ce52b-2de5-4873-96bd-5629d2e9ad10
+name: dashboard-data
+version: 1
+tags:
+  project: local-ai-usage
+  component: dashboard
+globalArguments:
+  public: '${{ data.latest("summary", "summary").attributes.public }}'
+methods: {}

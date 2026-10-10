@@ -1,0 +1,14 @@
+type: '@swamp/vercel/projects/domains'
+typeVersion: 2026.10.01.1
+id: 8e2f689e-5149-4345-96ae-5c40f2b789f9
+name: dashboard-domain
+version: 1
+tags:
+  project: local-ai-usage
+  component: dashboard
+globalArguments:
+  teamId: team_SMACO8iOr6wPIGx5as56P468
+  idOrName: '${{ data.latest("dashboard-project", "ai-usage").attributes.id }}'
+  name: ai-usage.kimberlygarmoe.com
+  token: '${{ vault.get("secrets", "vercel-token") }}'
+methods: {}
