@@ -3,7 +3,7 @@ import { Bar, BarChart, CartesianGrid, Line, LineChart, ReferenceDot, ReferenceL
 import { Section } from "@/components/Section";
 import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
 import {
-  allInput, AXIS, bothRows, cell, changeText, CONTEXT_SERIES, contextRows, eventMarkers, fmt, inputPerDay, MEASURE_UNIT, money, peakRow,
+  allInput, AXIS, bothRows, cell, changeText, CONTEXT_SERIES, contextRows, emptyText, eventMarkers, fmt, inputPerDay, MEASURE_UNIT, money, peakRow,
   RATE_SERIES, rateRows, span, TOOL_NAMES, TOOLS, topSeries, trendRows,
   type Kpi, type Measure, type Meta, type Row, type Series, type Tool, type Unit, type Week, type Which,
 } from "@/lib/shape";
@@ -23,7 +23,7 @@ const COST: Series = [{ key: "cost", label: "Estimated cost" }];
 const config = (series: Series): ChartConfig =>
   Object.fromEntries(series.map((s, i) => [s.key, { label: s.label, color: s.color ?? `var(--chart-${i + 1})` }]));
 
-const NoData = () => <p className="py-16 text-center text-sm text-muted-foreground">No data</p>;
+const NoData = ({ text = "no data" }: { text?: string }) => <p className="py-16 text-center text-sm text-muted-foreground first-letter:uppercase">{text}</p>;
 
 /** Stacked bars. Clicking a bar calls onSelect with its row. A legend only when there is more than one series. */
 function Stacked({ rows, series, x, unit, onSelect }: Data & { x: X; unit: Unit; onSelect?: Select }) {
@@ -31,7 +31,7 @@ function Stacked({ rows, series, x, unit, onSelect }: Data & { x: X; unit: Unit;
     <ChartContainer config={config(series)} className="h-64 w-full">
       <BarChart data={rows} accessibilityLayer>
         <CartesianGrid vertical={false} />
-        <XAxis dataKey={x} tickLine={false} />
+        <XAxis dataKey={x} tickLine={false} minTickGap={16} />
         <YAxis width={56} tickFormatter={AXIS[unit]} />
         <ChartTooltip content={<ChartTooltipContent valueFormatter={AXIS[unit]} />} />
         {series.length > 1 && <ChartLegend content={<ChartLegendContent />} />}
@@ -54,7 +54,7 @@ function Lines({ rows, series, unit, yMax, children }: Data & { unit: Unit; yMax
     <ChartContainer config={config(series)} className="h-64 w-full">
       <LineChart data={rows} accessibilityLayer margin={{ top: 5, right: labelled ? 64 : 16, bottom: 5, left: 5 }}>
         <CartesianGrid vertical={false} />
-        <XAxis dataKey="week" tickLine={false} />
+        <XAxis dataKey="week" tickLine={false} minTickGap={16} />
         <YAxis width={56} tickFormatter={AXIS[unit]} domain={[0, (max: number) => Math.max(max, yMax ?? 0)]} />
         <ChartTooltip content={<ChartTooltipContent valueFormatter={AXIS[unit]} />} />
         {series.map((s, i) => (
@@ -84,7 +84,7 @@ export function Trend({ weeks, tool, meta, kpi }: { weeks: Week[]; tool: Tool; m
     >
       <Lines rows={rows} series={[{ key: "inputPerDay", label: "Input per day" }]} unit="tokens" yMax={kpi.baseline}>
         {kpi.baseline !== null && (
-          <ReferenceLine y={kpi.baseline} stroke="var(--muted-foreground)" strokeDasharray="6 4" label={{ ...LABEL, value: "Baseline", position: "insideTopRight" }} />
+          <ReferenceLine y={kpi.baseline} stroke="var(--muted-foreground)" strokeDasharray="6 4" label={{ ...LABEL, value: "Baseline", position: "insideBottomLeft" }} />
         )}
         {eventMarkers(weeks, tool, meta.events).map((e) => (
           <ReferenceLine key={e.week + e.label} x={e.week} stroke="var(--foreground)" label={{ ...LABEL, value: e.label, position: "insideTopLeft" }} />
@@ -127,12 +127,12 @@ export function TokensCard({ tool, data, x, scope, title, note, onSelect }: {
   const name = TOOL_NAMES[tool], peak = peakRow(data.rows, data.series);
   return (
     <Section
-      title={!peak ? `${name} tokens: no data` : title ?? `${name}'s busiest ${x} was ${peak.row[x]}, ${fmt(peak.total)} tokens`}
+      title={!peak ? `${name} tokens: ${emptyText(data.rows)}` : title ?? `${name}'s busiest ${x} was ${peak.row[x]}, ${fmt(peak.total)} tokens`}
       summary={`Stacked bar chart of ${name} tokens per ${x} by type, ${scope}.${note ? ` ${note}` : ""}`}
       columns={[X_LABEL[x], ...data.series.map((s) => s.label)]}
       rows={data.rows.map((r) => [String(r[x]), ...data.series.map((s) => cell(r[s.key]))])}
     >
-      {peak ? <Stacked {...data} x={x} unit="tokens" onSelect={onSelect} /> : <NoData />}
+      {peak ? <Stacked {...data} x={x} unit="tokens" onSelect={onSelect} /> : <NoData text={emptyText(data.rows)} />}
     </Section>
   );
 }
@@ -142,12 +142,12 @@ export function CostCard({ tool, rows, x, scope, onSelect }: { tool: Tool; rows:
   const name = TOOL_NAMES[tool], peak = peakRow(rows, COST);
   return (
     <Section
-      title={peak ? `${name} cost peaked at ${money(peak.total)} ${AT[x]} ${peak.row[x]} (estimate at API list price)` : `${name} cost: no data`}
+      title={peak ? `${name} cost peaked at ${money(peak.total)} ${AT[x]} ${peak.row[x]} (estimate at API list price)` : `${name} cost: ${emptyText(rows)}`}
       summary={`Bar chart of ${name} cost per ${x} in US dollars, an estimate at API list price, ${scope}.${!peak && tool === "codex" ? " Codex has no prices yet, so there is no estimate." : ""}`}
       columns={[X_LABEL[x], "Estimated cost"]}
       rows={rows.map((r) => [String(r[x]), cell(r.cost, "$")])}
     >
-      {peak ? <Stacked rows={rows} series={COST} x={x} unit="$" onSelect={onSelect} /> : <NoData />}
+      {peak ? <Stacked rows={rows} series={COST} x={x} unit="$" onSelect={onSelect} /> : <NoData text={emptyText(rows)} />}
     </Section>
   );
 }
@@ -159,12 +159,12 @@ export function MixCard({ tool, by, which, mix, x, scope, onSelect }: {
   const name = TOOL_NAMES[tool], thread = which === "models" ? "main-thread" : "subagent", top = topSeries(mix.series, mix.rows), unit = MEASURE_UNIT[by];
   return (
     <Section
-      title={top ? `${top.label} has the most ${name} ${thread} ${MEASURE_NOUN[by]}` : `${name} ${thread} ${MEASURE_NOUN[by]} by model: no data`}
+      title={top ? `${top.label} has the most ${name} ${thread} ${MEASURE_NOUN[by]}` : `${name} ${thread} ${MEASURE_NOUN[by]} by model: ${emptyText(mix.rows)}`}
       summary={`Stacked bar chart of ${name} ${thread} ${MEASURE_TEXT[by]} per ${x} by model, ${scope}. Models outside the tool's top 7 are grouped as other.`}
       columns={[X_LABEL[x], ...mix.series.map((s) => s.label)]}
       rows={mix.rows.map((r) => [String(r[x]), ...mix.series.map((s) => cell(r[s.key], unit))])}
     >
-      {top ? <Stacked {...mix} x={x} unit={unit} onSelect={onSelect} /> : <NoData />}
+      {top ? <Stacked {...mix} x={x} unit={unit} onSelect={onSelect} /> : <NoData text={emptyText(mix.rows)} />}
     </Section>
   );
 }
@@ -182,7 +182,7 @@ export function ContextCard({ weeks, tool, baseline }: { weeks: Week[]; tool: To
       {last ? (
         <Lines rows={rows} series={CONTEXT_SERIES} unit="tokens" yMax={baseline}>
           {baseline !== null && (
-            <ReferenceLine y={baseline} stroke="var(--muted-foreground)" strokeDasharray="6 4" label={{ ...LABEL, value: "Baseline peak", position: "insideBottomLeft" }} />
+            <ReferenceLine y={baseline} stroke="var(--muted-foreground)" strokeDasharray="6 4" label={{ ...LABEL, value: "Baseline peak", position: "insideTopLeft" }} />
           )}
         </Lines>
       ) : <NoData />}

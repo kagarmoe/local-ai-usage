@@ -71,7 +71,7 @@ export function dayTokenRows(w: Week, tool: Tool): { series: Series; rows: Row[]
 export const dayCostRows = (w: Week, tool: Tool): Row[] => perDay(w, tool).map(({ base, d }) => ({ ...base, cost: d ? d.costUSD : null }));
 
 export function dayMix(weeks: Week[], w: Week, tool: Tool, measure: Measure, which: Which): { series: Series; rows: Row[] } {
-  const pal = palette(weeks, tool), rows = perDay(w, tool).map(({ base, d }) => mixRow(pal, d?.[which] ?? null, measure, base));
+  const pal = palette(weeks, tool), rows = perDay(w, tool).map(({ base, d }) => mixRow(pal, d, which, measure, base));
   return { series: present(pal, rows), rows };
 }
 
@@ -84,7 +84,7 @@ export const hourTokenRows = (w: Week, date: string, tool: Tool): Row[] =>
 export const hourCostRows = (w: Week, date: string, tool: Tool): Row[] => perHour(w, date, tool).map(({ base, h }) => ({ ...base, cost: h ? h.costUSD : null }));
 
 export function hourMix(weeks: Week[], w: Week, date: string, tool: Tool, measure: Measure, which: Which): { series: Series; rows: Row[] } {
-  const pal = palette(weeks, tool), rows = perHour(w, date, tool).map(({ base, h }) => mixRow(pal, h?.[which] ?? null, measure, base));
+  const pal = palette(weeks, tool), rows = perHour(w, date, tool).map(({ base, h }) => mixRow(pal, h, which, measure, base));
   return { series: present(pal, rows), rows };
 }
 

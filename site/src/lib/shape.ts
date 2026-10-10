@@ -142,8 +142,10 @@ export function palette(weeks: Week[], tool: Tool): Series {
 
 const measureOf = (s: ModelStat, m: Measure) => (m === "input" ? s.input : m === "calls" ? s.calls : s.costUSD);
 
-/** One model-mix row: each model's measure added into its palette key; models outside the palette, and raw "other", go to "other". Null stats give null cells; a null cost makes its cell null. */
-export function mixRow(pal: Series, stats: Models | null, measure: Measure, base: Row): Row {
+/** One model-mix row: each model's measure added into its palette key; models outside the palette, and raw "other", go to "other". A null record gives null cells; a null cost makes its cell null. */
+export function mixRow(pal: Series, rec: ({ costUSD: number | null } & Record<Which, Models>) | null, which: Which, measure: Measure, base: Row): Row {
+  // A record with null cost had no priced calls: its cost is unknown, not zero, even when idle.
+  const stats = !rec || (measure === "cost" && rec.costUSD === null) ? null : rec[which];
   const row: Row = { ...base };
   for (const s of pal) row[s.key] = stats ? 0 : null;
   for (const [id, s] of Object.entries(stats ?? {})) {
@@ -161,7 +163,7 @@ export const present = (series: Series, rows: Row[]) => series.filter((s) => row
 /** A measure per plotted week by model, main thread (`models`) or subagents (`subagentModels`). */
 export function modelMix(weeks: Week[], tool: Tool, measure: Measure, which: Which): { series: Series; rows: Row[] } {
   const pal = palette(weeks, tool);
-  const rows = plotted(weeks, tool).map((r) => mixRow(pal, r.data?.[which] ?? null, measure, { week: r.week }));
+  const rows = plotted(weeks, tool).map((r) => mixRow(pal, r.data ?? null, which, measure, { week: r.week }));
   return { series: present(pal, rows), rows };
 }
 
@@ -246,6 +248,19 @@ export const span = (rows: Row[]) =>
   rows.length === 0 ? "no complete weeks yet"
   : rows.length === 1 ? `1 complete week, ${rows[0].week}`
   : `${rows.length} complete weeks, ${rows[0].week} to ${rows[rows.length - 1].week}`;
+
+/** SVG path for a 100×24 sparkline, with gaps where a value is null; a week with no neighbours is a zero-length segment (a dot with round caps). Null below two values. */
+export function sparkPath(values: (number | null)[]): string | null {
+  const nums = values.filter((v): v is number => v !== null);
+  if (nums.length < 2) return null;
+  const max = Math.max(...nums), min = Math.min(...nums), W = 100, H = 24;
+  const x = (i: number) => ((i / (values.length - 1)) * W).toFixed(1);
+  const y = (v: number) => (max === min ? H / 2 : H - ((v - min) / (max - min)) * H).toFixed(1);
+  return values.map((v, i) => (v === null ? "" : i > 0 && values[i - 1] !== null ? `L${x(i)},${y(v)}` : `M${x(i)},${y(v)}h0`)).join("");
+}
+
+/** What an empty chart says: "none" when the tool has data but every value is zero, "no data" when the values are missing. */
+export const emptyText = (rows: Row[]) => (rows.some((r) => Object.values(r).some((v) => typeof v === "number")) ? "none" : "no data");
 
 const total = (r: Row, keys: string[]) => keys.reduce((n, k) => n + (typeof r[k] === "number" ? (r[k] as number) : 0), 0);
 

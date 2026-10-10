@@ -1,6 +1,6 @@
 import { assertEquals } from "jsr:@std/assert@1.0.19";
-import { dayMix, dayTokenRows, hourTokenRows, href, parseView } from "./drill.ts";
-import type { Day, Hour, ToolWeek, Week } from "./shape.ts";
+import { dayMix, dayTokenRows, hourMix, hourTokenRows, href, parseView } from "./drill.ts";
+import { emptyText, type Day, type Hour, type ToolWeek, type Week } from "./shape.ts";
 
 const tool = (o: Partial<ToolWeek> = {}): ToolWeek => ({
   complete: true, tokens: { input: 0, cacheRead: 700, cacheWrite: 0, output: 10 }, costUSD: 5, perDay: [], perHour: [],
@@ -41,4 +41,10 @@ Deno.test("hour rows take only that weekday's hours and fill the rest with zero"
   const w = week("2026-W40", "2026-09-28", { claudeCode: tool({ perHour: [h(2, 9, 50), h(3, 9, 7)] }) });
   const rows = hourTokenRows(w, "2026-09-29", "claudeCode");
   assertEquals([rows.length, rows[9], rows[10].input], [24, { hour: "09:00", input: 50, output: 0 }, 0]);
+});
+
+Deno.test("a tool without prices has no cost data, even in an idle hour", () => {
+  // regression: Codex's idle hours made its cost-by-model chart say "none"
+  const w = week("2026-W40", "2026-09-28", { codex: tool({ costUSD: null, models: { "gpt-5.5": { calls: 1, input: 5, output: 1, costUSD: null } } }) });
+  assertEquals(emptyText(hourMix([w], w, "2026-09-29", "codex", "cost", "models").rows), "no data");
 });

@@ -1,6 +1,6 @@
 import { assertEquals } from "jsr:@std/assert@1.0.19";
 import {
-  bothRows, changeText, eventMarkers, fmt, heatmap, inputPerDay, kpis, modelMix, money, parseWeeks, span, tokenRows, trendRows,
+  bothRows, changeText, emptyText, eventMarkers, fmt, heatmap, inputPerDay, kpis, modelMix, money, parseWeeks, span, sparkPath, tokenRows, trendRows,
   type Meta, type ModelStat, type ToolWeek, type Week,
 } from "./shape.ts";
 
@@ -103,4 +103,14 @@ Deno.test("fmt rounds up a unit at the edge, money keeps cents only under $10, s
   assertEquals([fmt(999_999), fmt(999_949), fmt(192_000_000), fmt(999)], ["1M", "999.9K", "192M", "999"]); // regression: 999,999 was "1000K"
   assertEquals([money(802.98), money(1234), money(0.416), money(9.996)], ["$803", "$1.2K", "$0.42", "$10"]);
   assertEquals([span([{ week: "2026-W40" }]), span([{ week: "2026-W39" }, { week: "2026-W40" }])], ["1 complete week, 2026-W40", "2 complete weeks, 2026-W39 to 2026-W40"]);
+});
+
+Deno.test("an empty chart says none when the tool was idle and no data when values are missing", () => {
+  // regression: a day with no subagent calls was titled "no data"
+  assertEquals([emptyText([{ hour: "09:00", m0: 0 }]), emptyText([{ hour: "09:00", date: "2026-09-29", m0: null }])], ["none", "no data"]);
+});
+
+Deno.test("a sparkline draws a week with no neighbours as a dot", () => {
+  // regression: Codex's latest week sat between gaps and was not drawn
+  assertEquals(sparkPath([2, null, 4, 6, null, 8]), "M0.0,24.0h0M40.0,16.0h0L60.0,8.0M100.0,0.0h0");
 });
