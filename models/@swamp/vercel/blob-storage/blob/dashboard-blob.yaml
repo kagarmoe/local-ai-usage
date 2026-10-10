@@ -1,0 +1,14 @@
+type: '@swamp/vercel/blob-storage/blob'
+typeVersion: 2026.10.01.1
+id: 5763c098-cbfa-4b4b-853d-c488484b9703
+name: dashboard-blob
+version: 1
+tags:
+  project: local-ai-usage
+  component: dashboard
+globalArguments:
+  teamId: team_SMACO8iOr6wPIGx5as56P468
+  name: ai-usage
+  access: public
+  token: '${{ vault.get("secrets", "vercel-token") }}'
+methods: {}

@@ -32,5 +32,20 @@
     "checksum": "82024d5f46372ec7c3830cc9d6d7b6532797275302c43b8add420b644c777dce",
     "filesChecksum": "414a27ca017db6b6333aa8907ea01f9f617c1c111b0449cf1e974ee39edf0539",
     "serverUrl": "https://swamp-club.com"
+  },
+  "@swamp/vercel/blob-storage": {
+    "version": "2026.10.01.1",
+    "pulledAt": "2026-10-10T05:04:21.567Z",
+    "files": [
+      ".swamp/bundles/6d8e0eff/blob.js",
+      ".swamp/pulled-extensions/@swamp/vercel/blob-storage/files/LICENSE.txt",
+      ".swamp/pulled-extensions/@swamp/vercel/blob-storage/files/README.md",
+      ".swamp/pulled-extensions/@swamp/vercel/blob-storage/manifest.yaml",
+      ".swamp/pulled-extensions/@swamp/vercel/blob-storage/models/_lib/vercel.ts",
+      ".swamp/pulled-extensions/@swamp/vercel/blob-storage/models/blob.ts"
+    ],
+    "checksum": "11718374edd0c1c90a785bcee2b625d84eca53ff139d305f4b32c91ff42134be",
+    "filesChecksum": "103d9074e54a733bec091ac73000773712a4217b12c19a7be66dbab3cb87b0c8",
+    "serverUrl": "https://swamp-club.com"
   }
 }
