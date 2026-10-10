@@ -1,0 +1,11 @@
+#!/bin/sh
+# Stand-in for the Vercel CLI in blob_upload_test.ts. Logs each call to $STUB_LOG.
+case "$1 $2" in
+  "env pull")
+    echo "pull: $3 | VERCEL_TOKEN=$VERCEL_TOKEN" >> "$STUB_LOG"
+    if [ -n "$STUB_NO_TOKEN" ]; then echo 'VERCEL_OIDC_TOKEN="oidc"' > "$3"; else echo 'BLOB_READ_WRITE_TOKEN="vercel_blob_rw_stub"' > "$3"; fi ;;
+  "blob put")
+    echo "put: $* | BLOB_READ_WRITE_TOKEN=$BLOB_READ_WRITE_TOKEN" >> "$STUB_LOG"
+    if [ -n "$STUB_FAIL" ]; then echo "stub: upload refused" >&2; exit 1; fi ;;
+  *) echo "unexpected: $*" >&2; exit 2 ;;
+esac
