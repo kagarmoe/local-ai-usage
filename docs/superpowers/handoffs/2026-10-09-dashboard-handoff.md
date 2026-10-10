@@ -31,12 +31,13 @@ Swamp notes: `~/obsidian/Resources/swamp/` (`swamp.md` index, `swamp-practice.md
 
 ## Blocked on the user
 
-1. **Spec review.** The spec is not yet approved. After approval: invoke
-   `superpowers:writing-plans`.
+1. **Plan review.** The spec is approved (2026-10-10). The plan is
+   `docs/superpowers/plans/2026-10-09-dashboard.md`. The user reviews it and picks an execution
+   method (subagent-driven or native).
 
 ## Next (in order)
 
-1. Write the plan (`docs/superpowers/plans/`), then build `dashboard-data`, `blob-upload`, `site/`
+1. Execute the plan: build `dashboard-data`, `blob-upload`, `site/`
    and the workflow steps, test-first with `deno task test`. The `blob-upload` task first checks
    that `vercel env pull` authenticates from env `VERCEL_TOKEN` (spec Status).
 2. When `site/` lands: set `dashboard-project` `rootDirectory: site` and
