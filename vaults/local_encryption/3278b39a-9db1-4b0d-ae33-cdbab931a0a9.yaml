@@ -1,0 +1,7 @@
+id: 3278b39a-9db1-4b0d-ae33-cdbab931a0a9
+name: secrets
+type: local_encryption
+config:
+  auto_generate: true
+  base_dir: /Users/kimberlygarmoe/repos/local-ai-usage
+createdAt: '2026-10-10T03:41:58.755Z'

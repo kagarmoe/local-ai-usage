@@ -53,7 +53,7 @@ const publicTool = (s: WeeklySnapshot | undefined) =>
 /** The public contract. Reads only `summary`, `costCheck`, and `rateLimits` from snapshots; `private` never leaves. */
 export function buildSummary(snaps: WeeklySnapshot[], events: Event[]) {
   const get = (week: string, tool: Tool) => snaps.find((s) => s.week === week && s.tool === tool);
-  const weeks = [...new Set(snaps.map((s) => s.week))].sort().reverse(); // newest first; publish.sh reads weeks[0]
+  const weeks = [...new Set(snaps.map((s) => s.week))].sort().reverse(); // newest first; publish names its commit after weeks[0]
   return {
     schemaVersion: 1,
     // From snapshot times, not the clock: a run with no new snapshot writes an identical file.

@@ -41,7 +41,7 @@ repo. Extensions are TypeScript (Deno).
 | `@kagarmoe/local-ai-usage/claude-code` model | `scan(week)` reads one ISO week of Claude Code logs and writes the versioned `weekly` resource. `calibrate()` fits `prices.yaml` rates from `cost-state` records. `status()` reports configuration with setup hints. |
 | `@kagarmoe/local-ai-usage/codex` model | `scan(week)` reads one ISO week of Codex logs and writes the versioned `weekly` resource. `status()` as above. |
 | `@kagarmoe/local-ai-usage-report` | Workflow-scope report. Markdown: full private detail. JSON: the public contract (below), built from all stored weekly snapshots. |
-| `local-ai-usage-weekly` workflow | Jobs: `scan-claude-code` and `scan-codex` in parallel (`allowFailure: true`) → report → `publish` (`command/shell`). No `trigger.schedule`: launchd runs it. |
+| `local-ai-usage-weekly` workflow | Jobs: `scan-claude-code` and `scan-codex` in parallel (`allowFailure: true`) → report → `publish` (`@kagarmoe/local-ai-usage/publish`). No `trigger.schedule`: launchd runs it. |
 | `prices.yaml` | Per-model rates (USD per million tokens) for input, cache read, cache write, output. Claude rates come from `calibrate()`. Codex rates are entered by hand. |
 | `events.yaml` | Hand-edited list of config changes (`date`, `label`). The report copies it to `events` in the public JSON. |
 | LaunchAgent `com.kagarmoe.local-ai-usage` | Runs `swamp workflow run local-ai-usage-weekly` in this repo at login (`RunAtLoad`) and daily at 09:17 (`StartCalendarInterval`; a time missed during sleep fires on wake). Logs in `~/Library/Logs/local-ai-usage.log`. No `swamp serve`. |
@@ -159,9 +159,11 @@ repo. Extensions are TypeScript (Deno).
 
 ## Publish step
 
-`command/shell` step: write `public/summary.json` from the report JSON. If the file
-changed, `git commit -m "chore(data): weekly summary <week>"` and `git push`. If nothing
-changed, do not commit. A failed push fails the step; retry with
+`publish.publish` (extension model `@kagarmoe/local-ai-usage/publish`; the repo's swamp rules
+reserve `command/shell` for ad-hoc commands). On `main` only. If `public/summary.json` or
+`prices.yaml` changed, `git commit -m "chore(data): weekly summary <week>"`. Then `git push`
+even with no change, so an earlier failed push goes out. Writes a `publish` resource
+(`committed`, `pushed`, `sha`, `week`). A failed push fails the step; retry with
 `swamp workflow resume local-ai-usage-weekly --run <id>`.
 
 `.swamp/` (raw snapshots) is gitignored.

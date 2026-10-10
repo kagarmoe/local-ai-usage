@@ -42,8 +42,6 @@ jobs:
         task:
           type: model_method
           modelIdOrName: publish
-          methodName: execute
-          inputs:
-            run: sh scripts/publish.sh
-            workingDir: /Users/kimberlygarmoe/repos/local-ai-usage
+          methodName: publish
+          inputs: {}
 version: 1

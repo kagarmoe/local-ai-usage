@@ -1,0 +1,8 @@
+type: '@kagarmoe/local-ai-usage/publish'
+typeVersion: 2026.10.09.1
+id: eac136d6-1e95-4fa1-8c0c-cb5154023001
+name: publish
+version: 1
+tags: {}
+globalArguments: {}
+methods: {}
