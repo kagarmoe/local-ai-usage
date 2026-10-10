@@ -248,6 +248,14 @@ matches the day (ISO weekday, Monday = 1). Breadcrumb: All weeks › W41 › Wed
 Creating the Blob store, the project and the domain, and pushing before the merge,
 each need the user's approval.
 
+**Status 2026-10-09:** the user approved the store. `dashboard-blob.create` ran from the main
+checkout, because the `secrets` vault lives there; a worktree has its own empty `.swamp/`. It
+created `store_blBRxMbrxzEnI88l` (public, `iad1`). The definition and the extension lockfile are
+committed on `dashboard`. The main checkout holds identical uncommitted copies; discard them
+(`git checkout -- extensions/models/upstream_extensions.json` and remove
+`models/@swamp/vercel/blob-storage/`) right before merging. Run all later swamp setup and
+spike steps from the main checkout for the same reason.
+
 ## Out of scope (bead `localai-mdf`)
 
 Cost charts, subagent model mix chart, context chart, Codex rate-limit chart, `?by=`
