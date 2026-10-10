@@ -13,7 +13,7 @@ export function Section({ title, summary, columns, rows, children }: {
   return (
     <Card>
       <CardHeader>
-        <CardTitle><h2>{title}</h2></CardTitle>
+        <CardTitle><h3>{title}</h3></CardTitle>
         <CardDescription>{summary}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

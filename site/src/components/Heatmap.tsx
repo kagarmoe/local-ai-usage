@@ -1,16 +1,16 @@
 import { Section } from "@/components/Section";
-import { DAYS, fmt, heatmap, type Week } from "@/lib/shape";
+import { DAYS, fmt } from "@/lib/shape";
 
 const HOURS = Array.from({ length: 24 }, (_, h) => String(h).padStart(2, "0"));
 
-/** 7 × 24 HTML table: one hue at increasing strength, and each cell prints its value. */
-export function Heatmap({ weeks }: { weeks: Week[] }) {
-  const grid = heatmap(weeks), max = Math.max(...grid.flat());
+/** 7 × 24 HTML table: one hue at increasing strength, and each cell prints its value. `scope` says which weeks the grid sums. */
+export function Heatmap({ grid, scope }: { grid: number[][]; scope: string }) {
+  const max = Math.max(...grid.flat());
   const peak = grid.flatMap((r, d) => r.map((v, h) => ({ v, d, h }))).reduce((a, b) => (b.v > a.v ? b : a));
   return (
     <Section
-      title={max ? `Busiest hour: ${DAYS[peak.d]} ${HOURS[peak.h]}:00` : "Input by weekday and hour"}
-      summary="Input tokens by weekday and hour (Pacific time), summed over all complete weeks of Claude Code and Codex. Stronger color means more input."
+      title={max ? `Busiest hour: ${DAYS[peak.d]} ${HOURS[peak.h]}:00` : "Input by weekday and hour: no data"}
+      summary={`Input tokens by weekday and hour (Pacific time), Claude Code and Codex combined, ${scope}. Stronger color means more input.`}
     >
       <div className="overflow-x-auto">
         <table className="border-separate border-spacing-0.5 text-[10px] tabular-nums">
