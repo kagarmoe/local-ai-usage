@@ -1,0 +1,39 @@
+id: 551024a0-95d4-4796-a17f-d6558b187f44
+name: dashboard-setup
+tags: {}
+jobs:
+  - name: setup
+    steps:
+      - name: project
+        guard: '${{ data.latest("dashboard-project", "ai-usage").?attributes.?id.orValue("") != "" }}'
+        task:
+          type: model_method
+          modelIdOrName: dashboard-project
+          methodName: create
+          inputs: {}
+      # A guarded skip cascades to plain succeeded/completed dependents, so these accept skipped too.
+      - name: blob
+        dependsOn:
+          - step: project
+            condition:
+              type: or
+              conditions: [{ type: succeeded }, { type: skipped }]
+        guard: '${{ data.latest("dashboard-blob", "ai-usage").?attributes.?id.orValue("") != "" }}'
+        task:
+          type: model_method
+          modelIdOrName: dashboard-blob
+          methodName: create
+          inputs: {}
+      - name: domain
+        dependsOn:
+          - step: project
+            condition:
+              type: or
+              conditions: [{ type: succeeded }, { type: skipped }]
+        guard: '${{ data.latest("dashboard-domain", "ai-usage.kimberlygarmoe.com").?attributes.?name.orValue("") != "" }}'
+        task:
+          type: model_method
+          modelIdOrName: dashboard-domain
+          methodName: create
+          inputs: {}
+version: 1
