@@ -1,76 +1,161 @@
-# Handoff — local-ai-usage dashboard (sub-project 2), updated 2026-10-10
+# Handoff — local-ai-usage dashboard (sub-project 2), updated 2026-10-09 (post-build)
 
-Spec: `docs/superpowers/specs/2026-10-09-dashboard-design.md` (branch `dashboard`, worktree
-`.claude/worktrees/dashboard`). Read it first; its Status notes record what has run.
-Swamp notes: `~/obsidian/Resources/swamp/` (`swamp.md` index, `swamp-practice.md`,
-`swamp-currency.md`). Load the `swamp` skill before any swamp work.
+Read first:
+- the spec, `docs/superpowers/specs/2026-10-09-dashboard-design.md`;
+- the plan, `docs/superpowers/plans/2026-10-09-dashboard.md`.
 
-## Done
+Both are on branch `dashboard`, in worktree `.claude/worktrees/dashboard`.
 
-- Spec rewritten for the Blob design: render data → upload with `vercel blob put` → git-linked
-  Vite site reads `/data/*` through a rewrite. All commits are on `dashboard`; nothing pushed.
-- Vercel project `ai-usage` = `prj_EgYL9x4XYklFy2fVnxD9jhQJmSDH`, created by `dashboard-project`.
-  It is git-linked to `kagarmoe/local-ai-usage` (production branch `main`), uses Vite on Node
-  24.x, and has no deployments yet. Phase 1 config: no `rootDirectory`, and an ignore command
-  `git diff --quiet HEAD^ HEAD -- site`.
-- Vercel Blob store `ai-usage` = `store_RoFNqrEhQsDUqZ7m` (public, `iad1`), host
-  `rofnqrehqsduqz7m.public.blob.vercel-storage.com`. Created by `dashboard-blob` with
-  `projectId` (CEL from `dashboard-project`), so it is connected to the project in all three
-  environments. The first store (`store_blBRxMbrxzEnI88l`) was deleted, empty, with the user's OK.
-- The main checkout is `vercel link`ed to `ai-usage`. `.vercel/` and `.env*` are ignored there
-  through `.git/info/exclude`, and through `.gitignore` on `dashboard`.
-- No Blob token in the vault. `blob-upload` will get the store's read-write token from
-  `vercel env pull` on each run (see spec).
-- Spike done (spec Status 2026-10-10). Key finding: `--add-random-suffix` and
-  `--allow-overwrite` are on/off flags, so `--add-random-suffix false` turns the suffix **on**.
-  Omit it.
-- Vault `secrets` (main checkout): `vercel-token` works.
-- The audit hook is enabled in local-ai-usage (`.claude/settings.local.json`, gitignored).
-- `rollbackOnFailure` works only on the TypeScript method; the definition-YAML form is ignored.
-  This is recorded in `swamp-currency.md`. No Lab issue is filed.
+SDD ledger (git-ignored, keep it until merge): `.superpowers/sdd/2026-10-09-dashboard/progress.md`. Its
+`Ruling:` and `minor (deferred)` lines are the decision record.
 
-## Blocked on the user
+## State
 
-1. **Plan review.** The spec is approved (2026-10-10). The plan is
-   `docs/superpowers/plans/2026-10-09-dashboard.md`. The user reviews it and picks an execution
-   method (subagent-driven or native).
+- **Built:** all six plan tasks are built, reviewed per task, and have been through the opus
+  whole-branch review and its fix pass. Head **807bacc**, tree clean, **nothing pushed**.
+- **Checks passing in the worktree:**
+  - `PATH=$HOME/.swamp/deno:$PATH deno task test` → 44 passed.
+  - `cd site && npm run build` → OK (a 597 kB chunk warning).
+  - `swamp model validate` passes for all four models.
+  - `swamp workflow validate` passes for `local-ai-usage-weekly` (28) and `dashboard-setup` (13).
+- **Not yet counted.** The user's rule is: "It only counts when swamp runs it." Tasks 1–3
+  (render, put, the weekly job) have not run on real data, so they are not done. Unit tests and
+  `validate` don't count.
 
-## Next (in order)
+## Next: the user-gate steps
 
-1. Execute the plan: build `dashboard-data`, `blob-upload`, `site/`
-   and the workflow steps, test-first with `deno task test`. The `blob-upload` task first checks
-   that `vercel env pull` authenticates from env `VERCEL_TOKEN` (spec Status).
-2. When `site/` lands: set `dashboard-project` `rootDirectory: site` and
-   `commandForIgnoringBuildStep: [ -n "$VERCEL_GIT_PREVIOUS_SHA" ] && git diff --quiet "$VERCEL_GIT_PREVIOUS_SHA" HEAD -- .`, then run
-   `swamp model method run dashboard-project update`.
-3. Domain: add a `dashboard-domain` (`@swamp/vercel/projects/domains`, project ID via CEL,
-   `ai-usage.kimberlygarmoe.com`). This needs the user's OK. DNS is already on Vercel
-   nameservers.
-4. Write the `dashboard-setup` workflow (project, then blob, then domain), with guards. The blob
-   step now needs the project's data, so it depends on the project step with
-   `or(succeeded, skipped)`, as the domain step does.
+Ask about each step separately, one question at a time, and wait for an explicit OK on each.
 
-## Gotchas
+1. **Copy, then run the weekly workflow.**
+   - Copy the branch into the main checkout:
+     `git -C ~/repos/local-ai-usage restore --source=dashboard --worktree -- <paths>`.
+     The paths are the extension models (`dashboard_data`, `blob_upload`), their definitions, the
+     weekly workflow, `models/@swamp/vercel/projects/domains/dashboard-domain.yaml`, and
+     `workflows/workflow-dashboard-setup.yaml`.
+   - The safety classifier blocked this copy once. Don't work around it; it needs the user's yes.
+   - Then run `swamp workflow run local-ai-usage-weekly` there. This pushes `main` (normal
+     daily behaviour) and makes the **first public Blob upload**. From then on, the LaunchAgent's
+     login and 09:17 runs also upload.
+   - Verify:
+     - `render` wrote `dashboard-data` with a `hash` attribute.
+     - `put` ran and recorded the same hash.
+     - A **second run skips** the upload (the guard).
+     - `weeks.jsonl` matches the same run's summary, which proves inputs resolve at step time
+       and not at run start.
+     - No BigInt `schemaVersion` error from CEL object typing.
+2. **Browser check** (plan Task 5 Step 7): load the site against the uploaded data (Vite dev
+   server with the rewrite, or a preview). Look for overlapping event-marker labels.
+3. **Update the project.** Run `swamp model method run dashboard-project update` from the main
+   checkout, before any push. It applies `rootDirectory: site` and the new ignore command. Builds of
+   `main` fail until the merge; that's accepted.
+4. **Push and preview.** Run `git push -u origin dashboard`, then check that the preview deploy builds.
+5. **Domain.** Run `swamp workflow run dashboard-setup`. Expect project and blob **skipped** and domain
+   **succeeded**. A second run skips all three steps.
+6. **Merge prep** (plan Task 6 Steps 7–9):
+   - Discard the main-checkout copies.
+   - Give the user the merge commands. The user merges; never merge into `main` yourself.
+   - Check the live site at ai-usage.kimberlygarmoe.com.
+   - Rewrite this handoff.
+7. Then delete the SDD workspace and use `superpowers:finishing-a-development-branch`.
 
-- **Run swamp from the main checkout** (`~/repos/local-ai-usage`). The worktree has its own
-  empty `.swamp/`, so its vault has no tokens. Do not copy secrets.
-- The main checkout holds **identical uncommitted copies** of
-  `extensions/models/upstream_extensions.json` and `models/@swamp/vercel/{blob-storage,projects}/`.
-  These are committed on `dashboard`. Right before merging, discard them:
-  `git checkout -- extensions/models/upstream_extensions.json && rm -r models/@swamp`. Also
-  remove the `vercel link` lines from `.git/info/exclude` once `.gitignore` covers them.
-- **Your shell exports a `BLOB_READ_WRITE_TOKEN` for a different, private store**
-  (`e5xfkavtfuaspfmn`). Any `vercel blob` command run by hand in this repo must override or
-  unset it, or it will act on that store.
-- `vercel blob` refuses to run from the repo root while `.env.local` holds `VERCEL_OIDC_TOKEN`
-  (written by `vercel link`) without `BLOB_STORE_ID`. Run uploads from a temp directory.
-- Never push to or merge into `main` yourself; the daily job pushes `main`. Never push tag
-  `pre-public-history`. Pushing `dashboard`, deploys, and the domain all need the user's OK.
-- `@swamp/vercel/projects` warns that `creator.via` is null and doesn't match its schema.
-  This is harmless.
-- The `generatedAt` in `meta.json` changes every run, so the upload hash leaves it out
-  (see spec).
-- The next 09:17 data push is the first real test of the ignore command. Check the project's
-  deployments; expect "Canceled by Ignored Build Step" or none.
-- Open beads: `localai-mdf` (full dashboard after v1), `localai-jao` (swamp serve via Tailscale).
-  The beads↔GitHub sync offer is still pending.
+Also offer, but don't do without an OK: record the guard finding below in
+`~/obsidian/Resources/swamp/swamp-currency.md`.
+
+## Swamp: verified facts (don't relearn)
+
+- **Load the `swamp` skill** before swamp work. Run `swamp help <cmd>` to check flags.
+- **Run swamp from the main checkout** (`~/repos/local-ai-usage`). The worktree's `.swamp/` is
+  empty, so it has no vault tokens. Don't copy secrets into it. The worktree is fine for
+  `swamp model validate` and `swamp workflow validate`.
+- **Deno:** not on PATH. Use swamp's bundled 2.9.7: `PATH=$HOME/.swamp/deno:$PATH deno ...`.
+  `deno task test` covers `extensions/` and `site/src/lib/`.
+- **Same-run CEL reads work.** A guard or input such as
+  `data.latest("m","d").attributes.x` (not null-safe) resolves **at step time** and sees data
+  written earlier in the same run.
+  - Proven with a real run in scratch repo `~/.claude/jobs/1c5e0728/tmp/scratch-repo`
+    (swamp 20261009.202715.0, workflow `samerun-wf`).
+  - The swamp skill's `references/workflow/reference.md:1175` says otherwise. **The binary wins.**
+  - The upload guard handles the never-uploaded case with null-safe access:
+    `data.latest("dashboard-upload","upload").?attributes.?hash.orValue("") == data.latest("dashboard-data","data").attributes.hash`.
+  - The opus reviewer predicted the first run would fail. The scratch run refuted that. If it fails
+    anyway, the fix is `.?` and `orValue` on the inputs too.
+- **`rollbackOnFailure`** works only on the TypeScript method; the YAML definition form is ignored.
+  This is already in `swamp-currency.md`.
+- **`dashboard-setup` workflow:** steps run project, then blob, then domain. Each step is guarded;
+  later steps depend on earlier ones with `or(succeeded, skipped)`. The project ID reaches blob
+  and domain through CEL from `dashboard-project` data.
+- **Harmless warnings:**
+  - `@swamp/vercel/projects` reports that `creator.via` is null and doesn't match its schema.
+  - The pulled `@swamp/vercel/deployments` extension reports missing source files.
+- **Vault:** the vault `secrets` in the main checkout holds `vercel-token`, which works. No Blob token
+  is stored.
+
+## Vercel: verified facts (don't relearn)
+
+- **IDs:**
+  - team `team_SMACO8iOr6wPIGx5as56P468`;
+  - project `ai-usage` = `prj_EgYL9x4XYklFy2fVnxD9jhQJmSDH`;
+  - Blob store `ai-usage` = `store_RoFNqrEhQsDUqZ7m` (public, `iad1`);
+  - Blob host `https://rofnqrehqsduqz7m.public.blob.vercel-storage.com`.
+- **Project setup:**
+  - The project is git-linked to `kagarmoe/local-ai-usage`, with production branch `main`.
+  - Framework Vite, Node 24.x.
+  - **No deployments yet.**
+  - The Blob store is connected to the project in all three environments.
+- **Phase-2 config is on the branch, not yet applied.** `dashboard-project.yaml` sets `rootDirectory: site` and
+  `commandForIgnoringBuildStep: '[ -n "$VERCEL_GIT_PREVIOUS_SHA" ] && git diff --quiet "$VERCEL_GIT_PREVIOUS_SHA" HEAD -- .'`.
+  - `VERCEL_GIT_PREVIOUS_SHA` is the last *successful* deploy's SHA for that branch.
+  - It is set only when an Ignored Build Step is configured, and is empty on a branch's first
+    deploy, so the command fails open and the build runs.
+  - Exit 0 skips the build; non-zero builds. With `rootDirectory: site`, `-- .` means `site/`.
+  - The old `HEAD^` form missed site changes when several commits landed between deploys.
+  - Sources: Vercel's system-environment-variables docs, and community thread 39835.
+- **How the site gets its data:** `site/vercel.json` rewrites `/data/:path*` to the Blob host,
+  so the site is static and fetches `/data/weeks.jsonl` and `/data/meta.json`.
+- **Uploading with `vercel blob put`:**
+  - The `blob-upload` model gets the store's read-write token by running `vercel env pull` (with
+    env `VERCEL_TOKEN`) into a temp dir on each call. It sets the token per call, so it never
+    inherits the shell's.
+  - **The shell's own `BLOB_READ_WRITE_TOKEN` belongs to a different, private store**
+    (`e5xfkavtfuaspfmn`). Any manual `vercel blob` command must override or unset it.
+  - `--add-random-suffix` and `--allow-overwrite` are on/off flags. Passing `false` turns the
+    option **on**. Omit `--add-random-suffix`.
+  - `vercel blob` refuses to run from the repo root while `.env.local` holds `VERCEL_OIDC_TOKEN`
+    without `BLOB_STORE_ID`. Run it from a temp dir.
+- The upload hash leaves out `meta.json`'s `generatedAt`, which changes on every run.
+- The main checkout is `vercel link`ed. `.vercel/` and `.env*` are ignored through `.git/info/exclude`
+  there, and through `.gitignore` on `dashboard`. At merge prep, remove the exclude lines.
+- DNS for kimberlygarmoe.com is already on Vercel nameservers.
+
+## Repo gotchas
+
+- **The global gitignore (`~/.gitignore_python`) ignores `/site` and `lib/`.** The repo
+  `.gitignore` has `!/site` and `!site/src/lib/` to undo that. Check new files under `site/` with
+  `git status`; a dirty tree once hid that `site/src/lib` was missing.
+- **The main checkout holds identical uncommitted copies** of `extensions/models/upstream_extensions.json`
+  and `models/@swamp/vercel/{blob-storage,projects}/`. Step 1 adds more. Discard them all
+  right before the merge, e.g. `git checkout -- extensions/models/upstream_extensions.json && rm -r models/@swamp`
+  plus any restored paths. **Look before deleting.**
+- **Hard rules:**
+  - Never push to or merge into `main`; the daily job pushes `main`.
+  - Never push tag `pre-public-history`.
+  - No `git reset --hard` and no force-push.
+  - Pushes, deploys, the domain, and uploads need the user's OK.
+- **Commit trailers:** `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>` and
+  `Claude-Session: https://claude.ai/code/session_01KYWSCv6e2HngoSJyzdx318`.
+- **Open beads:**
+  - `localai-mdf`: the full dashboard after v1.
+  - `localai-jao`: swamp serve over Tailscale.
+  - The beads↔GitHub sync offer is still pending.
+
+## Deferred minors
+
+Full list in the ledger. Highlights:
+- **Upload and Blob:** upload `meta.json` last; a stale or cleared Blob goes undetected.
+- **Template leftovers:** `button.tsx` and its dependencies (`@base-ui/react`, `lucide-react`,
+  `class-variance-authority`), `site/README.md`, `.oxlintrc.json`.
+- **Formatting:** `fmt(999_999)` shows "1000K".
+- **Page robustness:** no shape check on `meta.json`, no fetch abort, no empty-chart message.
+- **Bundle size:** one 597 kB chunk.
+- **Workflow tags:** `dashboard-setup` has `tags: {}`.
+- **Missing test:** no test for temp-dir cleanup in `blob_upload`.
