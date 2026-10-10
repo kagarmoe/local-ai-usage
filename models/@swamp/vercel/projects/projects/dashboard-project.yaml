@@ -13,8 +13,7 @@ globalArguments:
   gitRepository:
     type: github
     repo: kagarmoe/local-ai-usage
-  # Phase 1 (no site/ on main yet): skip every build that doesn't touch site/.
-  # When site/ lands: rootDirectory: site, and the ignore command becomes `-- .`.
-  commandForIgnoringBuildStep: git diff --quiet HEAD^ HEAD -- site
+  rootDirectory: site
+  commandForIgnoringBuildStep: git diff --quiet HEAD^ HEAD -- .
   token: '${{ vault.get("secrets", "vercel-token") }}'
 methods: {}
