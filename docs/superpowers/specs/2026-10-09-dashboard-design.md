@@ -52,8 +52,9 @@ Models communicate only through CEL data chaining (`data.latest(...)`).
      latest scan time and changes every run, so including it would defeat the upload
      guard. The uploaded `meta.json` therefore keeps the `generatedAt` of the last
      *changed* data, and the site labels it "Data as of".
-  - Do not use `rollbackOnFailure`. It does not roll back in this swamp version. One write
-    at the end gives the same guarantee.
+  - No `rollbackOnFailure`: with a single write at the end, it adds nothing. (In this swamp
+    version it only works when set on the TypeScript method; the definition-YAML form is
+    ignored.)
 - Resource lifetime: infinite. Garbage collection: 10 versions.
 - Logic lives in `_lib/dashboard_data.ts` (pure functions); the model file only wires it.
 
