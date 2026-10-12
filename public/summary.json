@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "generatedAt": "2026-10-10T00:27:08.545Z",
+ "generatedAt": "2026-10-12T16:28:51.759Z",
  "costBasis": "api-list-price-estimate",
  "baseline": {
   "label": "2026-09-21 – 2026-10-09",
@@ -10,7 +10,7 @@
    "subagentOpusShare": 0.81
   },
   "codex": {
-   "inputPerDay": 974986,
+   "inputPerDay": 1203518,
    "peakContext": 238114,
    "weeklyRateLimitPeakPct": 32
   }
@@ -22,6 +22,885 @@
   }
  ],
  "weeks": [
+  {
+   "week": "2026-W41",
+   "start": "2026-10-05",
+   "status": "complete",
+   "claudeCode": {
+    "complete": true,
+    "sessions": 13,
+    "calls": 2126,
+    "tokens": {
+     "input": 6640,
+     "cacheRead": 257197090,
+     "cacheWrite": 7565882,
+     "output": 1699805
+    },
+    "costUSD": 123.37776368360012,
+    "perDay": [
+     {
+      "date": "2026-10-05",
+      "sessions": 3,
+      "calls": 155,
+      "tokens": {
+       "input": 2394,
+       "cacheRead": 15910742,
+       "cacheWrite": 1024153,
+       "output": 70894
+      },
+      "costUSD": 14.8280438673,
+      "models": {
+       "claude-fable-5-1": {
+        "calls": 60,
+        "input": 10384931,
+        "output": 64495,
+        "costUSD": 8.707366038600002
+       },
+       "claude-opus-5-5": {
+        "calls": 12,
+        "input": 1602817,
+        "output": 5312,
+        "costUSD": 1.3924173101000001
+       }
+      },
+      "subagentModels": {
+       "claude-opus-5-5": {
+        "calls": 50,
+        "input": 2835187,
+        "output": 661,
+        "costUSD": 1.2985046727000003
+       },
+       "claude-fable-5-1": {
+        "calls": 33,
+        "input": 2114354,
+        "output": 426,
+        "costUSD": 3.4297558459000004
+       }
+      }
+     },
+     {
+      "date": "2026-10-06",
+      "sessions": 0,
+      "calls": 0,
+      "tokens": {
+       "input": 0,
+       "cacheRead": 0,
+       "cacheWrite": 0,
+       "output": 0
+      },
+      "costUSD": null,
+      "models": {},
+      "subagentModels": {}
+     },
+     {
+      "date": "2026-10-07",
+      "sessions": 0,
+      "calls": 0,
+      "tokens": {
+       "input": 0,
+       "cacheRead": 0,
+       "cacheWrite": 0,
+       "output": 0
+      },
+      "costUSD": null,
+      "models": {},
+      "subagentModels": {}
+     },
+     {
+      "date": "2026-10-08",
+      "sessions": 0,
+      "calls": 0,
+      "tokens": {
+       "input": 0,
+       "cacheRead": 0,
+       "cacheWrite": 0,
+       "output": 0
+      },
+      "costUSD": null,
+      "models": {},
+      "subagentModels": {}
+     },
+     {
+      "date": "2026-10-09",
+      "sessions": 10,
+      "calls": 1717,
+      "tokens": {
+       "input": 3728,
+       "cacheRead": 214094581,
+       "cacheWrite": 5235444,
+       "output": 1294876
+      },
+      "costUSD": 92.90275430160021,
+      "models": {
+       "claude-opus-5-5": {
+        "calls": 1413,
+        "input": 199789300,
+        "output": 1224093,
+        "costUSD": 82.22772171220024
+       },
+       "claude-haiku-5-5": {
+        "calls": 1,
+        "input": 31393,
+        "output": 4,
+        "costUSD": 0.0027580093999999998
+       }
+      },
+      "subagentModels": {
+       "claude-haiku-5-5": {
+        "calls": 4,
+        "input": 202366,
+        "output": 33,
+        "costUSD": 0.0090880937
+       },
+       "claude-opus-5-5": {
+        "calls": 126,
+        "input": 11315171,
+        "output": 5529,
+        "costUSD": 5.010415339700001
+       },
+       "claude-sonnet-5-5": {
+        "calls": 165,
+        "input": 7500690,
+        "output": 64669,
+        "costUSD": 4.820230419799999
+       },
+       "claude-fable-5-1": {
+        "calls": 8,
+        "input": 494833,
+        "output": 548,
+        "costUSD": 0.8325407268
+       }
+      }
+     },
+     {
+      "date": "2026-10-10",
+      "sessions": 1,
+      "calls": 254,
+      "tokens": {
+       "input": 518,
+       "cacheRead": 27191767,
+       "cacheWrite": 1306285,
+       "output": 334035
+      },
+      "costUSD": 15.646965514699986,
+      "models": {
+       "claude-opus-5-5": {
+        "calls": 198,
+        "input": 24979595,
+        "output": 307309,
+        "costUSD": 14.070427270299989
+       }
+      },
+      "subagentModels": {
+       "claude-haiku-5-5": {
+        "calls": 16,
+        "input": 931228,
+        "output": 16502,
+        "costUSD": 0.026763048399999996
+       },
+       "claude-sonnet-5-5": {
+        "calls": 16,
+        "input": 758001,
+        "output": 2088,
+        "costUSD": 0.5884954124
+       },
+       "claude-opus-5-5": {
+        "calls": 24,
+        "input": 1829746,
+        "output": 8136,
+        "costUSD": 0.9612797835999998
+       }
+      }
+     },
+     {
+      "date": "2026-10-11",
+      "sessions": 0,
+      "calls": 0,
+      "tokens": {
+       "input": 0,
+       "cacheRead": 0,
+       "cacheWrite": 0,
+       "output": 0
+      },
+      "costUSD": null,
+      "models": {},
+      "subagentModels": {}
+     }
+    ],
+    "perHour": [
+     {
+      "dow": 1,
+      "hour": 15,
+      "input": 1921936,
+      "output": 2897,
+      "costUSD": 1.4444447691999998,
+      "models": {
+       "claude-fable-5-1": {
+        "calls": 8,
+        "input": 668637,
+        "output": 2599,
+        "costUSD": 0.8371799826999999
+       }
+      },
+      "subagentModels": {
+       "claude-opus-5-5": {
+        "calls": 21,
+        "input": 1253299,
+        "output": 298,
+        "costUSD": 0.6072647865000002
+       }
+      }
+     },
+     {
+      "dow": 1,
+      "hour": 16,
+      "input": 15015353,
+      "output": 67997,
+      "costUSD": 13.383599098100003,
+      "models": {
+       "claude-fable-5-1": {
+        "calls": 52,
+        "input": 9716294,
+        "output": 61896,
+        "costUSD": 7.870186055900001
+       },
+       "claude-opus-5-5": {
+        "calls": 12,
+        "input": 1602817,
+        "output": 5312,
+        "costUSD": 1.3924173101000001
+       }
+      },
+      "subagentModels": {
+       "claude-opus-5-5": {
+        "calls": 29,
+        "input": 1581888,
+        "output": 363,
+        "costUSD": 0.6912398862000001
+       },
+       "claude-fable-5-1": {
+        "calls": 33,
+        "input": 2114354,
+        "output": 426,
+        "costUSD": 3.4297558459000004
+       }
+      }
+     },
+     {
+      "dow": 5,
+      "hour": 12,
+      "input": 3003405,
+      "output": 26929,
+      "costUSD": 1.6984499262,
+      "models": {
+       "claude-opus-5-5": {
+        "calls": 27,
+        "input": 2801039,
+        "output": 26896,
+        "costUSD": 1.6893618325
+       }
+      },
+      "subagentModels": {
+       "claude-haiku-5-5": {
+        "calls": 4,
+        "input": 202366,
+        "output": 33,
+        "costUSD": 0.0090880937
+       }
+      }
+     },
+     {
+      "dow": 5,
+      "hour": 13,
+      "input": 34763566,
+      "output": 107967,
+      "costUSD": 11.844829960000004,
+      "models": {
+       "claude-opus-5-5": {
+        "calls": 161,
+        "input": 34763566,
+        "output": 107967,
+        "costUSD": 11.844829960000004
+       }
+      },
+      "subagentModels": {}
+     },
+     {
+      "dow": 5,
+      "hour": 14,
+      "input": 49506712,
+      "output": 159871,
+      "costUSD": 17.204094966600003,
+      "models": {
+       "claude-opus-5-5": {
+        "calls": 200,
+        "input": 47693128,
+        "output": 159715,
+        "costUSD": 16.350949614600005
+       }
+      },
+      "subagentModels": {
+       "claude-opus-5-5": {
+        "calls": 22,
+        "input": 1813584,
+        "output": 156,
+        "costUSD": 0.8531453519999997
+       }
+      }
+     },
+     {
+      "dow": 5,
+      "hour": 15,
+      "input": 24137132,
+      "output": 136694,
+      "costUSD": 9.8419274047,
+      "models": {
+       "claude-opus-5-5": {
+        "calls": 180,
+        "input": 22267281,
+        "output": 133555,
+        "costUSD": 8.918334597499998
+       }
+      },
+      "subagentModels": {
+       "claude-sonnet-5-5": {
+        "calls": 37,
+        "input": 1869851,
+        "output": 3139,
+        "costUSD": 0.9235928072
+       }
+      }
+     },
+     {
+      "dow": 5,
+      "hour": 16,
+      "input": 17387964,
+      "output": 200280,
+      "costUSD": 9.4137790397,
+      "models": {
+       "claude-opus-5-5": {
+        "calls": 136,
+        "input": 13161403,
+        "output": 197857,
+        "costUSD": 7.5180411753000005
+       },
+       "claude-haiku-5-5": {
+        "calls": 1,
+        "input": 31393,
+        "output": 4,
+        "costUSD": 0.0027580093999999998
+       }
+      },
+      "subagentModels": {
+       "claude-opus-5-5": {
+        "calls": 43,
+        "input": 4195168,
+        "output": 2419,
+        "costUSD": 1.892979855
+       }
+      }
+     },
+     {
+      "dow": 5,
+      "hour": 17,
+      "input": 14620864,
+      "output": 111782,
+      "costUSD": 7.1295231074999945,
+      "models": {
+       "claude-opus-5-5": {
+        "calls": 128,
+        "input": 13605106,
+        "output": 111128,
+        "costUSD": 5.958187190599995
+       }
+      },
+      "subagentModels": {
+       "claude-opus-5-5": {
+        "calls": 11,
+        "input": 520925,
+        "output": 106,
+        "costUSD": 0.33879519010000003
+       },
+       "claude-fable-5-1": {
+        "calls": 8,
+        "input": 494833,
+        "output": 548,
+        "costUSD": 0.8325407268
+       }
+      }
+     },
+     {
+      "dow": 5,
+      "hour": 20,
+      "input": 11568438,
+      "output": 84541,
+      "costUSD": 5.509135817,
+      "models": {
+       "claude-opus-5-5": {
+        "calls": 99,
+        "input": 11568438,
+        "output": 84541,
+        "costUSD": 5.509135817
+       }
+      },
+      "subagentModels": {}
+     },
+     {
+      "dow": 5,
+      "hour": 21,
+      "input": 20288371,
+      "output": 174162,
+      "costUSD": 10.524830585599997,
+      "models": {
+       "claude-opus-5-5": {
+        "calls": 182,
+        "input": 18267797,
+        "output": 120830,
+        "costUSD": 8.441013592499994
+       }
+      },
+      "subagentModels": {
+       "claude-sonnet-5-5": {
+        "calls": 35,
+        "input": 2020574,
+        "output": 53332,
+        "costUSD": 2.0838169931
+       }
+      }
+     },
+     {
+      "dow": 5,
+      "hour": 22,
+      "input": 15238346,
+      "output": 92901,
+      "costUSD": 6.442905432199998,
+      "models": {
+       "claude-opus-5-5": {
+        "calls": 132,
+        "input": 15238346,
+        "output": 92901,
+        "costUSD": 6.442905432199998
+       }
+      },
+      "subagentModels": {}
+     },
+     {
+      "dow": 5,
+      "hour": 23,
+      "input": 28818955,
+      "output": 199749,
+      "costUSD": 13.293278062099995,
+      "models": {
+       "claude-opus-5-5": {
+        "calls": 168,
+        "input": 20423196,
+        "output": 188703,
+        "costUSD": 9.554962499999998
+       }
+      },
+      "subagentModels": {
+       "claude-sonnet-5-5": {
+        "calls": 93,
+        "input": 3610265,
+        "output": 8198,
+        "costUSD": 1.8128206195000003
+       },
+       "claude-opus-5-5": {
+        "calls": 50,
+        "input": 4785494,
+        "output": 2848,
+        "costUSD": 1.9254949425999996
+       }
+      }
+     },
+     {
+      "dow": 6,
+      "hour": 0,
+      "input": 18835874,
+      "output": 287852,
+      "costUSD": 11.671494669099994,
+      "models": {
+       "claude-opus-5-5": {
+        "calls": 120,
+        "input": 15316899,
+        "output": 261126,
+        "costUSD": 10.094956424699998
+       }
+      },
+      "subagentModels": {
+       "claude-haiku-5-5": {
+        "calls": 16,
+        "input": 931228,
+        "output": 16502,
+        "costUSD": 0.026763048399999996
+       },
+       "claude-sonnet-5-5": {
+        "calls": 16,
+        "input": 758001,
+        "output": 2088,
+        "costUSD": 0.5884954124
+       },
+       "claude-opus-5-5": {
+        "calls": 24,
+        "input": 1829746,
+        "output": 8136,
+        "costUSD": 0.9612797835999998
+       }
+      }
+     },
+     {
+      "dow": 6,
+      "hour": 1,
+      "input": 84475,
+      "output": 1532,
+      "costUSD": 0.0457292255,
+      "models": {
+       "claude-opus-5-5": {
+        "calls": 1,
+        "input": 84475,
+        "output": 1532,
+        "costUSD": 0.0457292255
+       }
+      },
+      "subagentModels": {}
+     },
+     {
+      "dow": 6,
+      "hour": 9,
+      "input": 1114645,
+      "output": 7541,
+      "costUSD": 0.6694008574999999,
+      "models": {
+       "claude-opus-5-5": {
+        "calls": 12,
+        "input": 1114645,
+        "output": 7541,
+        "costUSD": 0.6694008574999999
+       }
+      },
+      "subagentModels": {}
+     },
+     {
+      "dow": 6,
+      "hour": 11,
+      "input": 7542658,
+      "output": 33509,
+      "costUSD": 2.9404411472000005,
+      "models": {
+       "claude-opus-5-5": {
+        "calls": 59,
+        "input": 7542658,
+        "output": 33509,
+        "costUSD": 2.9404411472000005
+       }
+      },
+      "subagentModels": {}
+     },
+     {
+      "dow": 6,
+      "hour": 12,
+      "input": 920918,
+      "output": 3601,
+      "costUSD": 0.3198996154,
+      "models": {
+       "claude-opus-5-5": {
+        "calls": 6,
+        "input": 920918,
+        "output": 3601,
+        "costUSD": 0.3198996154
+       }
+      },
+      "subagentModels": {}
+     }
+    ],
+    "context": {
+     "avgLongSession": 146350,
+     "p95": 343216,
+     "peak": 485738
+    },
+    "sessionStartMedian": 38025,
+    "models": {
+     "claude-fable-5-1": {
+      "calls": 60,
+      "input": 10384931,
+      "output": 64495,
+      "costUSD": 8.707366038600002
+     },
+     "claude-opus-5-5": {
+      "calls": 1623,
+      "input": 226371712,
+      "output": 1536714,
+      "costUSD": 97.69056629260017
+     },
+     "claude-haiku-5-5": {
+      "calls": 1,
+      "input": 31393,
+      "output": 4,
+      "costUSD": 0.0027580093999999998
+     }
+    },
+    "subagentModels": {
+     "claude-opus-5-5": {
+      "calls": 200,
+      "input": 15980104,
+      "output": 14326,
+      "costUSD": 7.270199795999999
+     },
+     "claude-fable-5-1": {
+      "calls": 41,
+      "input": 2609187,
+      "output": 974,
+      "costUSD": 4.2622965727
+     },
+     "claude-haiku-5-5": {
+      "calls": 20,
+      "input": 1133594,
+      "output": 16535,
+      "costUSD": 0.0358511421
+     },
+     "claude-sonnet-5-5": {
+      "calls": 181,
+      "input": 8258691,
+      "output": 66757,
+      "costUSD": 5.408725832199999
+     }
+    },
+    "costCheck": {
+     "sessions": 13,
+     "deltaPct": -11.3
+    }
+   },
+   "codex": {
+    "complete": true,
+    "sessions": 21,
+    "calls": 96,
+    "tokens": {
+     "input": 293544,
+     "cacheRead": 3820032,
+     "cacheWrite": 0,
+     "output": 16866,
+     "reasoning": 1358
+    },
+    "costUSD": null,
+    "perDay": [
+     {
+      "date": "2026-10-05",
+      "sessions": 6,
+      "calls": 81,
+      "tokens": {
+       "input": 293544,
+       "cacheRead": 3820032,
+       "cacheWrite": 0,
+       "output": 16866,
+       "reasoning": 1358
+      },
+      "costUSD": null,
+      "models": {
+       "gpt-6.1-sol": {
+        "calls": 77,
+        "input": 4036667,
+        "output": 16175,
+        "costUSD": null
+       }
+      },
+      "subagentModels": {
+       "codex-auto-review": {
+        "calls": 4,
+        "input": 76909,
+        "output": 691,
+        "costUSD": null
+       }
+      }
+     },
+     {
+      "date": "2026-10-06",
+      "sessions": 0,
+      "calls": 0,
+      "tokens": {
+       "input": 0,
+       "cacheRead": 0,
+       "cacheWrite": 0,
+       "output": 0,
+       "reasoning": 0
+      },
+      "costUSD": null,
+      "models": {},
+      "subagentModels": {}
+     },
+     {
+      "date": "2026-10-07",
+      "sessions": 0,
+      "calls": 0,
+      "tokens": {
+       "input": 0,
+       "cacheRead": 0,
+       "cacheWrite": 0,
+       "output": 0,
+       "reasoning": 0
+      },
+      "costUSD": null,
+      "models": {},
+      "subagentModels": {}
+     },
+     {
+      "date": "2026-10-08",
+      "sessions": 0,
+      "calls": 0,
+      "tokens": {
+       "input": 0,
+       "cacheRead": 0,
+       "cacheWrite": 0,
+       "output": 0,
+       "reasoning": 0
+      },
+      "costUSD": null,
+      "models": {},
+      "subagentModels": {}
+     },
+     {
+      "date": "2026-10-09",
+      "sessions": 0,
+      "calls": 0,
+      "tokens": {
+       "input": 0,
+       "cacheRead": 0,
+       "cacheWrite": 0,
+       "output": 0,
+       "reasoning": 0
+      },
+      "costUSD": null,
+      "models": {},
+      "subagentModels": {}
+     },
+     {
+      "date": "2026-10-10",
+      "sessions": 0,
+      "calls": 0,
+      "tokens": {
+       "input": 0,
+       "cacheRead": 0,
+       "cacheWrite": 0,
+       "output": 0,
+       "reasoning": 0
+      },
+      "costUSD": null,
+      "models": {},
+      "subagentModels": {}
+     },
+     {
+      "date": "2026-10-11",
+      "sessions": 15,
+      "calls": 15,
+      "tokens": {
+       "input": 0,
+       "cacheRead": 0,
+       "cacheWrite": 0,
+       "output": 0,
+       "reasoning": 0
+      },
+      "costUSD": null,
+      "models": {
+       "unknown": {
+        "calls": 15,
+        "input": 0,
+        "output": 0,
+        "costUSD": null
+       }
+      },
+      "subagentModels": {}
+     }
+    ],
+    "perHour": [
+     {
+      "dow": 1,
+      "hour": 17,
+      "input": 3208435,
+      "output": 12799,
+      "costUSD": null,
+      "models": {
+       "gpt-6.1-sol": {
+        "calls": 59,
+        "input": 3131526,
+        "output": 12108,
+        "costUSD": null
+       }
+      },
+      "subagentModels": {
+       "codex-auto-review": {
+        "calls": 4,
+        "input": 76909,
+        "output": 691,
+        "costUSD": null
+       }
+      }
+     },
+     {
+      "dow": 1,
+      "hour": 18,
+      "input": 905141,
+      "output": 4067,
+      "costUSD": null,
+      "models": {
+       "gpt-6.1-sol": {
+        "calls": 18,
+        "input": 905141,
+        "output": 4067,
+        "costUSD": null
+       }
+      },
+      "subagentModels": {}
+     },
+     {
+      "dow": 7,
+      "hour": 21,
+      "input": 0,
+      "output": 0,
+      "costUSD": null,
+      "models": {
+       "unknown": {
+        "calls": 15,
+        "input": 0,
+        "output": 0,
+        "costUSD": null
+       }
+      },
+      "subagentModels": {}
+     }
+    ],
+    "context": {
+     "avgLongSession": 0,
+     "p95": 77525,
+     "peak": 89050
+    },
+    "sessionStartMedian": 0,
+    "models": {
+     "gpt-6.1-sol": {
+      "calls": 77,
+      "input": 4036667,
+      "output": 16175,
+      "costUSD": null
+     },
+     "unknown": {
+      "calls": 15,
+      "input": 0,
+      "output": 0,
+      "costUSD": null
+     }
+    },
+    "subagentModels": {
+     "codex-auto-review": {
+      "calls": 4,
+      "input": 76909,
+      "output": 691,
+      "costUSD": null
+     }
+    },
+    "rateLimits": {
+     "fiveHourPeakPct": 51,
+     "weeklyPeakPct": 14
+    }
+   }
+  },
   {
    "week": "2026-W40",
    "start": "2026-09-28",
