@@ -3,5 +3,5 @@ name: secrets
 type: local_encryption
 config:
   auto_generate: true
-  base_dir: /Users/kimberlygarmoe/repos/local-ai-usage
+  base_dir: /home/kimberly/repos/local-ai-usage
 createdAt: '2026-10-10T03:41:58.755Z'
