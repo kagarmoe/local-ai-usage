@@ -12,7 +12,7 @@ function fakeContext(projectsDir: string, repoDir: string, stored: string[]) {
     definition: { name: "claude-code" },
     repoDir,
     logger: { info() {} },
-    queryData: () => Promise.resolve(stored.map((w) => `weekly-${w}`)),
+    queryData: () => Promise.resolve(stored.map((w) => ({ name: `weekly-${w}` }))),
     writeResource: (spec: string, name: string, data: unknown) => {
       written.push({ spec, name, data });
       return Promise.resolve({ name });
@@ -41,4 +41,30 @@ Deno.test("scanMissing writes only completed weeks without a snapshot, and nothi
   const rerun = fakeContext(projects, repo, [twoAgo, oneAgo]);
   await model.methods.scanMissing.execute({}, rerun.ctx);
   assertEquals(rerun.written, []);
+});
+
+Deno.test("with prices as an argument (a worker run) the scan reads no checkout and records fitted rates as calibration", async () => {
+  const now = Date.now();
+  const haiku = "claude-haiku-4-5-20251001";
+  const projects = await writeFixture({
+    "p/s.jsonl": [
+      {
+        type: "assistant", timestamp: new Date(now - 7 * DAY).toISOString(), sessionId: "s",
+        message: { id: "m1", model: haiku, usage: { input_tokens: 14349, output_tokens: 15 } },
+      },
+      {
+        type: "cost-state", sessionId: "s", startTime: now - 7 * DAY, totalCostUSD: 0.014424,
+        modelUsage: { [haiku]: { inputTokens: 14349, outputTokens: 15, cacheReadInputTokens: 0, cacheCreationInputTokens: 0, costUSD: 0.014424 } },
+      },
+    ],
+  });
+  Deno.utimeSync(`${projects}/p/s.jsonl`, new Date(now - 7 * DAY), new Date(now - 7 * DAY));
+  const week = isoWeek(new Date(now - 7 * DAY));
+
+  const run = fakeContext(projects, "/nonexistent-checkout", []);
+  await model.methods.scanMissing.execute({ prices: { claude: {}, codex: {} } }, run.ctx);
+  const weekly = run.written.find((w) => w.name === `weekly-${week}`)!;
+  assertEquals(weekly.data.summary.costUSD > 0, true);
+  const cal = run.written.find((w) => w.spec === "calibration")!;
+  assertEquals(cal.data.claude[haiku], { input: 1, cacheRead: 0.1, cacheWrite: 1.25, output: 5 });
 });
