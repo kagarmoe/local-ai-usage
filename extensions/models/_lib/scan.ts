@@ -93,10 +93,10 @@ export function buildSnapshots(o: {
   });
 }
 
-/** Weeks that already have a snapshot for this model. */
+/** Weeks that already have a snapshot for this model. No select projection: swamp refuses them from workers. */
 export async function storedWeeks(ctx: Ctx): Promise<Set<string>> {
-  const names = await ctx.queryData(`modelName == "${ctx.definition.name}" && specName == "weekly"`, "name");
-  return new Set(names.map((n) => String(n).replace(/^weekly-/, "")));
+  const rows = await ctx.queryData(`modelName == "${ctx.definition.name}" && specName == "weekly"`);
+  return new Set(rows.map((r) => String((r as { name: string }).name).replace(/^weekly-/, "")));
 }
 
 /** Shared scan: pick weeks, parse only files written since the earliest one, write a `weekly` resource per week. */

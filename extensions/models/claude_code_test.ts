@@ -12,7 +12,7 @@ function fakeContext(projectsDir: string, repoDir: string, stored: string[]) {
     definition: { name: "claude-code" },
     repoDir,
     logger: { info() {} },
-    queryData: () => Promise.resolve(stored.map((w) => `weekly-${w}`)),
+    queryData: () => Promise.resolve(stored.map((w) => ({ name: `weekly-${w}` }))),
     writeResource: (spec: string, name: string, data: unknown) => {
       written.push({ spec, name, data });
       return Promise.resolve({ name });
