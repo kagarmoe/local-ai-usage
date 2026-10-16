@@ -1,8 +1,12 @@
 import { parse, stringify } from "jsr:@std/yaml@1.3.0";
+import { z } from "npm:zod@4";
 
 /** USD per million tokens. */
-export type Rate = { input: number; cacheRead: number; cacheWrite: number; output: number };
-export type Prices = { claude: Record<string, Rate>; codex: Record<string, Rate> };
+export const RateSchema = z.object({ input: z.number(), cacheRead: z.number(), cacheWrite: z.number(), output: z.number() });
+/** prices.yaml as data. Scans placed on a worker take it as an argument: a worker has no checkout to read. */
+export const PricesSchema = z.object({ claude: z.record(z.string(), RateSchema), codex: z.record(z.string(), RateSchema) });
+export type Rate = z.infer<typeof RateSchema>;
+export type Prices = z.infer<typeof PricesSchema>;
 
 const HEADER = "# USD per million tokens. claude: scans add missing models from cost-state records. codex: enter by hand.\n";
 
@@ -13,6 +17,14 @@ export function loadPrices(path: string): Prices {
 
 export function savePrices(path: string, p: Prices): void {
   Deno.writeTextFileSync(path, HEADER + stringify(p, { sortKeys: true }));
+}
+
+/** `prices` plus every rate in `added` for a model it lacks. Existing rates are kept unchanged. */
+export function addRates(prices: Prices, added: Record<string, Rate>): { prices: Prices; models: string[] } {
+  const models = Object.keys(added).filter((m) => !prices.claude[m]).sort();
+  const claude = { ...prices.claude };
+  for (const m of models) claude[m] = added[m];
+  return { prices: { ...prices, claude }, models };
 }
 
 /** Cost of one call, or null when the model has no rate. Reasoning is inside output, so it is not priced again. */

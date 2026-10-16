@@ -3,22 +3,44 @@ name: local-ai-usage-weekly
 tags: {}
 reports:
   require: ["@kagarmoe/local-ai-usage-report"]
+trigger:
+  # swamp serve on Hestia (WSL) fires this; the scans run on hippolyta, where the logs are.
+  # Four times a day so a run lands while hippolyta is awake; scans only add missing weeks, and
+  # publish and upload are no-ops when nothing changed.
+  schedule: "17 9,13,17,21 * * *"
 jobs:
+  - name: prices
+    steps:
+      - name: load-prices
+        task:
+          type: model_method
+          modelIdOrName: prices
+          methodName: load
+          inputs: {}
   - name: scan
+    dependsOn:
+      - job: prices
+        condition:
+          type: succeeded
+    # On a worker: the logs live only on hippolyta. A worker has no checkout, so prices come in as data.
+    labels:
+      host: hippolyta
     steps:
       - name: scan-claude-code
         task:
           type: model_method
           modelIdOrName: claude-code
           methodName: scanMissing
-          inputs: {}
+          inputs:
+            prices: '${{ data.latest("prices", "prices").attributes }}'
         allowFailure: true
       - name: scan-codex
         task:
           type: model_method
           modelIdOrName: codex
           methodName: scanMissing
-          inputs: {}
+          inputs:
+            prices: '${{ data.latest("prices", "prices").attributes }}'
         allowFailure: true
   - name: build
     dependsOn:
@@ -26,6 +48,12 @@ jobs:
         condition:
           type: completed
     steps:
+      - name: merge-prices
+        task:
+          type: model_method
+          modelIdOrName: prices
+          methodName: merge
+          inputs: {}
       - name: build-summary
         task:
           type: model_method
@@ -61,7 +89,7 @@ jobs:
           - step: render
             condition:
               type: succeeded
-        # Skips unchanged data (the workflow runs at login and at 09:17); works before the first upload.
+        # Skips unchanged data (the workflow runs four times a day); works before the first upload.
         guard: '${{ data.latest("dashboard-upload", "upload").?attributes.?hash.orValue("") == data.latest("dashboard-data", "data").attributes.hash }}'
         task:
           type: model_method
