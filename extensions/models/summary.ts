@@ -8,10 +8,9 @@ const Events = z.array(z.object({ date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
 
 export const model = {
   type: "@kagarmoe/local-ai-usage/summary",
-  version: "2026.10.09.1",
+  version: "2026.10.17.1",
   globalArguments: z.object({
     sources: z.array(z.string()).default(["claude-code", "codex"]),
-    outFile: z.string().default("public/summary.json"),
     eventsFile: z.string().default("events.yaml"),
   }),
   resources: {
@@ -24,7 +23,7 @@ export const model = {
   },
   methods: {
     build: {
-      description: "Write public/summary.json and the private markdown from the latest snapshot of every week",
+      description: "Build the public summary and the private markdown from the latest snapshot of every week (swamp data only; nothing is written to the repo)",
       arguments: z.object({}),
       execute: async (_args: Record<string, never>, ctx: Ctx) => {
         const snaps: WeeklySnapshot[] = [];
@@ -34,10 +33,7 @@ export const model = {
         }
         const events = Events.parse(parse(Deno.readTextFileSync(`${ctx.repoDir}/${ctx.globalArgs.eventsFile}`)) ?? []);
         const pub = buildSummary(snaps, events);
-        const out = `${ctx.repoDir}/${ctx.globalArgs.outFile}`;
-        Deno.mkdirSync(out.slice(0, out.lastIndexOf("/")), { recursive: true });
-        Deno.writeTextFileSync(out, JSON.stringify(pub, null, 1) + "\n");
-        ctx.logger.info("Wrote {weeks} weeks to {out}", { weeks: pub.weeks.length, out });
+        ctx.logger.info("Built {weeks} weeks", { weeks: pub.weeks.length });
         return { dataHandles: [await ctx.writeResource("summary", "summary", { public: pub, markdown: renderMarkdown(snaps) })] };
       },
     },
