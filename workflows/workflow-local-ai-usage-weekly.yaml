@@ -6,7 +6,7 @@ reports:
 trigger:
   # swamp serve on Hestia (WSL) fires this; the scans run on hippolyta, where the logs are.
   # Four times a day so a run lands while hippolyta is awake; scans only add missing weeks, and
-  # publish and upload are no-ops when nothing changed.
+  # upload is a no-op when nothing changed.
   schedule: "17 9,13,17,21 * * *"
 jobs:
   - name: prices
@@ -59,18 +59,6 @@ jobs:
           type: model_method
           modelIdOrName: summary
           methodName: build
-          inputs: {}
-  - name: publish
-    dependsOn:
-      - job: build
-        condition:
-          type: succeeded
-    steps:
-      - name: publish
-        task:
-          type: model_method
-          modelIdOrName: publish
-          methodName: publish
           inputs: {}
   - name: dashboard
     dependsOn:

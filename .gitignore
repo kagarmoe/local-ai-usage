@@ -26,3 +26,6 @@
 # The user's global python ignore lists /site (mkdocs output); ours is the dashboard source.
 !/site
 !site/src/lib/
+
+# Usage data lives in swamp data and the Vercel Blob store, never in the repo
+public/summary.json
