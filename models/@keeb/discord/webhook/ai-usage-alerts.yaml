@@ -1,0 +1,9 @@
+type: '@keeb/discord/webhook'
+typeVersion: 2026.02.14.2
+id: 8d63bb10-6098-4815-8749-e4b9a2fca3a3
+name: ai-usage-alerts
+version: 1
+tags: {}
+globalArguments:
+  webhookUrl: '${{ vault.get("secrets", "ai_usage_discord_web_url") }}'
+methods: {}

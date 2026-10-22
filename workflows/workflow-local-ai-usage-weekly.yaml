@@ -86,4 +86,23 @@ jobs:
           inputs:
             files: '${{ data.latest("dashboard-data", "data").attributes.files }}'
             hash: '${{ data.latest("dashboard-data", "data").attributes.hash }}'
+  # Failures only (it runs four times a day); a Discord outage must not fail the run.
+  - name: notify-failed
+    description: An earlier job failed, so dashboard did not succeed
+    dependsOn:
+      - job: dashboard
+        condition:
+          type: not
+          condition:
+            type: succeeded
+    steps:
+      - name: post-failed
+        task:
+          type: model_method
+          modelIdOrName: ai-usage-alerts
+          methodName: send
+          inputs:
+            content: "❌ local-ai-usage-weekly failed, so the dashboard was not updated. Details (WSL ~/repos/local-ai-usage): swamp report get @swamp/workflow-summary --workflow local-ai-usage-weekly"
+            username: local-ai-usage
+        allowFailure: true
 version: 1
