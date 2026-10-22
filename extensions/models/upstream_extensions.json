@@ -42,5 +42,21 @@
     "checksum": "11718374edd0c1c90a785bcee2b625d84eca53ff139d305f4b32c91ff42134be",
     "filesChecksum": "103d9074e54a733bec091ac73000773712a4217b12c19a7be66dbab3cb87b0c8",
     "serverUrl": "https://swamp-club.com"
+  },
+  "@keeb/discord": {
+    "version": "2026.07.18.1",
+    "pulledAt": "2026-10-22T23:25:51.731Z",
+    "files": [
+      ".agents/skills/discord",
+      ".claude/skills/discord",
+      ".swamp/pulled-extensions/@keeb/discord/files/LICENSE.txt",
+      ".swamp/pulled-extensions/@keeb/discord/files/README.md",
+      ".swamp/pulled-extensions/@keeb/discord/manifest.yaml",
+      ".swamp/pulled-extensions/@keeb/discord/models/webhook.ts"
+    ],
+    "checksum": "920df4ffdb2d9e8b1b9c149c4b4b5f483bafdd6f76dba9d36b695f3d25285fac",
+    "filesChecksum": "9fe2f8f8895bcf4c943b2e4695eb9f23eade868412f3381e00abd8209dbe08d1",
+    "serverUrl": "https://swamp-club.com",
+    "publishedChannel": "stable"
   }
 }
