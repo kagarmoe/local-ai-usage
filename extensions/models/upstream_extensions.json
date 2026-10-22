@@ -3,9 +3,6 @@
     "version": "2026.10.08.1",
     "pulledAt": "2026-10-10T03:42:00.341Z",
     "files": [
-      ".swamp/bundles/5dde58f0/domains.js",
-      ".swamp/bundles/5dde58f0/env.js",
-      ".swamp/bundles/5dde58f0/projects.js",
       ".swamp/pulled-extensions/@swamp/vercel/projects/files/LICENSE.txt",
       ".swamp/pulled-extensions/@swamp/vercel/projects/files/README.md",
       ".swamp/pulled-extensions/@swamp/vercel/projects/manifest.yaml",
@@ -22,7 +19,6 @@
     "version": "2026.10.02.1",
     "pulledAt": "2026-10-10T03:42:02.088Z",
     "files": [
-      ".swamp/bundles/624a362c/deployments.js",
       ".swamp/pulled-extensions/@swamp/vercel/deployments/files/LICENSE.txt",
       ".swamp/pulled-extensions/@swamp/vercel/deployments/files/README.md",
       ".swamp/pulled-extensions/@swamp/vercel/deployments/manifest.yaml",
@@ -37,7 +33,6 @@
     "version": "2026.10.01.1",
     "pulledAt": "2026-10-10T05:04:21.567Z",
     "files": [
-      ".swamp/bundles/6d8e0eff/blob.js",
       ".swamp/pulled-extensions/@swamp/vercel/blob-storage/files/LICENSE.txt",
       ".swamp/pulled-extensions/@swamp/vercel/blob-storage/files/README.md",
       ".swamp/pulled-extensions/@swamp/vercel/blob-storage/manifest.yaml",
