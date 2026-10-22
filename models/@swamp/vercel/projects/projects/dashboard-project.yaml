@@ -14,6 +14,9 @@ globalArguments:
     type: github
     repo: kagarmoe/local-ai-usage
   rootDirectory: site
-  commandForIgnoringBuildStep: '[ -n "$VERCEL_GIT_PREVIOUS_SHA" ] && git diff --quiet "$VERCEL_GIT_PREVIOUS_SHA" HEAD -- .'
+  # Same command as site/vercel.json's ignoreCommand, which overrides this per commit.
+  # Exit 0 skips the build, 1 builds, anything else fails it; Vercel's shallow clone may
+  # lack the previous commit, so build when it's missing.
+  commandForIgnoringBuildStep: 'if [ -n "$VERCEL_GIT_PREVIOUS_SHA" ] && git cat-file -e "$VERCEL_GIT_PREVIOUS_SHA^{commit}" 2>/dev/null && git diff --quiet "$VERCEL_GIT_PREVIOUS_SHA" HEAD -- .; then exit 0; else exit 1; fi'
   token: '${{ vault.get("secrets", "vercel-token") }}'
 methods: {}
