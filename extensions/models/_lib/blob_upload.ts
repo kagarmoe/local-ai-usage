@@ -22,8 +22,11 @@ export function blobPut(repoDir: string, files: DataFile[], token: string, bin =
       const local = `${tmp}/${f.pathname.replaceAll("/", "_")}`;
       Deno.writeTextFileSync(local, f.content);
       // cwd is tmp, not the repo: a .env.local there with VERCEL_OIDC_TOKEN makes the CLI refuse to run.
+      // Vercel CLI 63 asks for account credentials before any blob command, even with BLOB_READ_WRITE_TOKEN set
+      // ("No existing credentials found"): pass the same token and empty global config as env pull.
       run(["blob", "put", local, "--pathname", f.pathname, "--access", "public", "--allow-overwrite",
-        "--cache-control-max-age", "3600", "--content-type", TYPES[f.pathname.split(".").pop()!] ?? "text/plain"], tmp, { BLOB_READ_WRITE_TOKEN: rw });
+        "--cache-control-max-age", "3600", "--content-type", TYPES[f.pathname.split(".").pop()!] ?? "text/plain",
+        "--global-config", config], tmp, { BLOB_READ_WRITE_TOKEN: rw, VERCEL_TOKEN: token });
     }
   } finally {
     Deno.removeSync(tmp, { recursive: true });
