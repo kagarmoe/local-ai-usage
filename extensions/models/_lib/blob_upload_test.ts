@@ -27,6 +27,10 @@ Deno.test("puts each file with the pulled token in env, never argv, then deletes
   for (const p of puts) {
     const argv = p.split(" | ")[0];
     assertStringIncludes(p, "BLOB_READ_WRITE_TOKEN=vercel_blob_rw_stub");
+    // CLI 63 refuses blob commands without account credentials; a machine's own login must not stand in.
+    assertStringIncludes(p, "VERCEL_TOKEN=vercel_tok");
+    assertStringIncludes(argv, "--global-config ");
+    assertFalse(argv.includes("vercel_tok"));
     assertFalse(argv.includes("vercel_blob_rw_stub"));
     assertFalse(argv.includes("--add-random-suffix")); // regression: the flag is on/off, so "false" turns it on
   }
